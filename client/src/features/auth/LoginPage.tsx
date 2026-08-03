@@ -1,7 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authApi } from '@/api/auth.api';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/hooks';
 
 export const LoginPage = () => {
   const { login } = useAuth();
@@ -21,7 +21,8 @@ export const LoginPage = () => {
       login(accessToken, refreshToken, user);
       navigate(user.role === 'admin' ? '/admin' : '/dashboard');
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
+      const msg = (err as { response?: { data?: { error?: string } } })
+        ?.response?.data?.error;
       setError(msg ?? 'Login failed');
     } finally {
       setLoading(false);
@@ -34,22 +35,36 @@ export const LoginPage = () => {
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: 12 }}>
           <input
-            type="email" placeholder="Email" value={email} required
-            onChange={(e) => setEmail(e.target.value)} style={{ width: '100%', padding: 8 }}
+            type="email"
+            placeholder="Email"
+            value={email}
+            required
+            onChange={(e) => setEmail(e.target.value)}
+            style={{ width: '100%', padding: 8 }}
           />
         </div>
         <div style={{ marginBottom: 12 }}>
           <input
-            type="password" placeholder="Password" value={password} required
-            onChange={(e) => setPassword(e.target.value)} style={{ width: '100%', padding: 8 }}
+            type="password"
+            placeholder="Password"
+            value={password}
+            required
+            onChange={(e) => setPassword(e.target.value)}
+            style={{ width: '100%', padding: 8 }}
           />
         </div>
         {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit" disabled={loading} style={{ width: '100%', padding: 10 }}>
+        <button
+          type="submit"
+          disabled={loading}
+          style={{ width: '100%', padding: 10 }}
+        >
           {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
-      <p>Don't have an account? <Link to="/register">Register</Link></p>
+      <p>
+        Don't have an account? <Link to="/register">Register</Link>
+      </p>
     </div>
   );
 };

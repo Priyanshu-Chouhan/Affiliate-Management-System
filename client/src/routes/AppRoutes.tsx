@@ -1,13 +1,14 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { LoginPage } from '@/pages/auth/LoginPage';
-import { RegisterPage } from '@/pages/auth/RegisterPage';
-import { DashboardPage } from '@/pages/dashboard/DashboardPage';
-import { ReferralHistoryPage } from '@/pages/dashboard/ReferralHistoryPage';
-import { CommissionHistoryPage } from '@/pages/dashboard/CommissionHistoryPage';
-import { PayoutPage } from '@/pages/dashboard/PayoutPage';
-import { AdminPage } from '@/pages/admin/AdminPage';
+import { LoginPage, RegisterPage } from '@/features/auth';
+import {
+  DashboardPage,
+  ReferralHistoryPage,
+  CommissionHistoryPage,
+  PayoutPage,
+} from '@/features/affiliate';
+import { AdminPage } from '@/features/admin';
 import { ProtectedRoute } from './ProtectedRoute';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/hooks';
 
 export const AppRoutes = () => {
   const { token, user } = useAuth();
@@ -16,7 +17,12 @@ export const AppRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<Navigate to={isAuth ? '/dashboard' : '/login'} replace />} />
+      <Route
+        path="/"
+        element={
+          <Navigate to={isAuth ? '/dashboard' : '/login'} replace />
+        }
+      />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 

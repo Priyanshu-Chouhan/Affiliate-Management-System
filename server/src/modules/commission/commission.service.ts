@@ -23,6 +23,7 @@ export const createCommission = async (
       referralId: referral.id,
       purchaseId,
       amount: commissionAmount,
+      description: `Commission for purchase ${purchaseId}`,
     },
   });
 

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '@/middlewares/auth.middleware';
 import * as affiliateController from './affiliate.controller';
-import payoutRoutes from '@/modules/payout/payout.routes';
+import { payoutRoutes } from '@/modules/payout';
 
 const router = Router();
 router.use(authenticate);

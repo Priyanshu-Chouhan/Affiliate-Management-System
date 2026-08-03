@@ -1,8 +1,9 @@
-import axiosClient from './axiosClient';
+import axiosClient from '@/lib/axios';
+import type { LoginPayload, RegisterPayload } from '@/types';
 
 export const authApi = {
-  login: (payload: { email: string; password: string }) => axiosClient.post('/auth/login', payload),
-  register: (payload: { name: string; email: string; password: string; referralCode?: string }) =>
+  login: (payload: LoginPayload) => axiosClient.post('/auth/login', payload),
+  register: (payload: RegisterPayload) =>
     axiosClient.post('/auth/register', payload),
   refresh: () => axiosClient.post('/auth/refresh'),
 };

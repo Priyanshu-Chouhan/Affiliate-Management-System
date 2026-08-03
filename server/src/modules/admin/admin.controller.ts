@@ -8,7 +8,7 @@ export const getAffiliates = async (req: Request, res: Response, next: NextFunct
 };
 
 export const getAffiliate = async (req: Request, res: Response, next: NextFunction) => {
-  try { sendSuccess(res, await adminService.getAffiliate(req.params.id)); }
+  try { sendSuccess(res, await adminService.getAffiliate(req.params.id as string)); }
   catch (err) { next(err); }
 };
 
@@ -18,12 +18,12 @@ export const getPayouts = async (req: Request, res: Response, next: NextFunction
 };
 
 export const approvePayout = async (req: Request, res: Response, next: NextFunction) => {
-  try { sendSuccess(res, await adminService.approvePayout(req.params.id)); }
+  try { sendSuccess(res, await adminService.approvePayout(req.params.id as string)); }
   catch (err) { next(err); }
 };
 
 export const rejectPayout = async (req: Request, res: Response, next: NextFunction) => {
-  try { sendSuccess(res, await adminService.rejectPayout(req.params.id)); }
+  try { sendSuccess(res, await adminService.rejectPayout(req.params.id as string)); }
   catch (err) { next(err); }
 };
 

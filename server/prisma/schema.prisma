@@ -92,6 +92,7 @@ model Commission {
   purchaseId  String           @unique @map("purchase_id")
   amount      Decimal          @db.Decimal(10, 2)
   status      CommissionStatus @default(pending)
+  description String?
   createdAt   DateTime         @default(now()) @map("created_at")
 
   affiliate User     @relation(fields: [affiliateId], references: [id])

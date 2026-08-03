@@ -19,7 +19,9 @@ export const useFetch = <T>(fetcher: () => Promise<{ data: { data: T } }>) => {
     }
   }, [fetcher]);
 
-  useEffect(() => { fetch(); }, [fetch]);
+  useEffect(() => {
+    fetch();
+  }, [fetch]);
 
   return { data, loading, error, refetch: fetch };
 };

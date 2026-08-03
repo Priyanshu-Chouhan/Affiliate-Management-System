@@ -13,8 +13,8 @@ export const getReferralLink = async (userId: string) => {
 };
 
 export const getDashboard = async (userId: string) => {
-  const [totalReferrals, commissions, payouts] = await Promise.all([
-    db.referral.count({ where: { referrerId: userId } }),
+  const [referrals, commissions, payouts] = await Promise.all([
+    db.referral.findMany({ where: { referrerId: userId }, select: { status: true } }),
     db.commission.findMany({ where: { affiliateId: userId }, select: { amount: true, status: true } }),
     db.payoutRequest.findMany({
       where: { affiliateId: userId, status: { in: ['pending', 'paid'] } },
@@ -29,12 +29,17 @@ export const getDashboard = async (userId: string) => {
   const paid = commissions.filter((c) => c.status === 'paid');
   const pending = commissions.filter((c) => c.status === 'pending');
 
+  const successfulReferrals = referrals.filter((r) => r.status === 'purchased').length;
+  const pendingReferrals = referrals.filter((r) => r.status === 'pending').length;
+
   const totalApproved = sum(approved);
   const totalPaid = sum(paid);
   const pendingPayouts = sum(payouts.filter((p) => p.status === 'pending'));
 
   return {
-    totalReferrals,
+    totalReferrals: referrals.length,
+    successfulReferrals,
+    pendingReferrals,
     totalEarnings: totalApproved + totalPaid,
     availableBalance: totalApproved - pendingPayouts,
     pendingCommissions: sum(pending),
