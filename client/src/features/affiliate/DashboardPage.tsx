@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { affiliateApi } from '@/api/affiliate.api';
+import { purchaseApi } from '@/api/purchase.api';
 import { useAuth } from '@/hooks';
 import type { DashboardStats } from '@/types';
 import { StatCard, ReferralLinkBox } from './components';
@@ -21,9 +22,29 @@ export const DashboardPage = () => {
       .finally(() => setLoading(false));
   }, []);
 
+
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const handleSimulatePurchase = async () => {
+    try {
+      setLoading(true);
+      await purchaseApi.simulatePurchase({ amount: 1000, status: 'success' });
+      // Refresh dashboard stats
+      const [statsRes, linkRes] = await Promise.all([
+        affiliateApi.getDashboard(),
+        affiliateApi.getReferralLink(),
+      ]);
+      setStats(statsRes.data.data);
+      setReferralLink(linkRes.data.data.link);
+      alert('Purchase Successful! The referrer has received a commission.');
+    } catch (err: any) {
+      alert('Error making purchase: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) return <p>Loading...</p>;
@@ -64,11 +85,20 @@ export const DashboardPage = () => {
         {/* Link Box */}
         <ReferralLinkBox link={referralLink} />
 
-        {/* Navigation */}
-        <div className="glass-panel p-6 flex flex-wrap gap-4">
-          <Link to="/referrals" className="premium-button text-center w-auto">View Referrals</Link>
-          <Link to="/commissions" className="premium-button text-center w-auto">View Commissions</Link>
-          <Link to="/payout" className="px-6 py-3 rounded-xl bg-surface hover:bg-surface-hover text-white transition-colors border border-border">Request Payout</Link>
+        {/* Navigation & Actions */}
+        <div className="glass-panel p-6 flex flex-wrap gap-4 items-center justify-between">
+          <div className="flex flex-wrap gap-4">
+            <Link to="/referrals" className="premium-button text-center w-auto">View Referrals</Link>
+            <Link to="/commissions" className="premium-button text-center w-auto">View Commissions</Link>
+            <Link to="/payout" className="px-6 py-3 rounded-xl bg-surface hover:bg-surface-hover text-white transition-colors border border-border">Request Payout</Link>
+          </div>
+          
+          <button 
+            onClick={handleSimulatePurchase}
+            className="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold shadow-lg shadow-emerald-500/25 transition-all duration-300 active:scale-95"
+          >
+            🛒 Simulate Purchase ($1000)
+          </button>
         </div>
       </div>
     </div>
