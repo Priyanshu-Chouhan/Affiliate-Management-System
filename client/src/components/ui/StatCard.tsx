@@ -4,28 +4,12 @@ interface StatCardProps {
 }
 
 export const StatCard = ({ label, value }: StatCardProps) => (
-  <div
-    style={{
-      padding: 20,
-      border: '1px solid rgba(255,255,255,0.08)',
-      borderRadius: 12,
-      background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
-      backdropFilter: 'blur(10px)',
-      transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-    }}
-    onMouseEnter={(e) => {
-      (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
-      (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
-    }}
-    onMouseLeave={(e) => {
-      (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
-      (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
-    }}
-  >
-    <div style={{ fontSize: 12, color: '#94a3b8', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 8 }}>
+  <div className="glass-panel p-5 group hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 relative overflow-hidden">
+    <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full -z-10 group-hover:bg-primary/10 transition-colors duration-300" />
+    <div className="text-xs text-text-secondary tracking-wider uppercase mb-2 font-medium">
       {label}
     </div>
-    <div style={{ fontSize: 28, fontWeight: 700, color: '#f1f5f9' }}>
+    <div className="text-3xl font-bold text-text-primary">
       {value}
     </div>
   </div>

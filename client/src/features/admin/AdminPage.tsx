@@ -66,7 +66,7 @@ export const AdminPage = () => {
     try {
       if (action === 'approve') await adminApi.approvePayout(id);
       else await adminApi.rejectPayout(id);
-      setActionMsg(`Payout ${action}d`);
+      setActionMsg(`Payout ${action}d successfully`);
       adminApi
         .getPayouts(payoutStatus)
         .then((r) => setPayouts(r.data.data));
@@ -81,73 +81,69 @@ export const AdminPage = () => {
     navigate('/login');
   };
 
-  const tabStyle = (t: Tab): React.CSSProperties => ({
-    padding: '8px 16px',
-    cursor: 'pointer',
-    background: 'none',
-    border: 'none',
-    borderBottom: tab === t ? '2px solid #333' : '2px solid transparent',
-    fontWeight: tab === t ? 'bold' : 'normal',
-  });
-
   return (
-    <div style={{ maxWidth: 900, margin: '40px auto', padding: 24 }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 24,
-        }}
-      >
-        <h1>Admin Panel</h1>
-        <button onClick={handleLogout}>Logout</button>
-      </div>
-
-      <div
-        style={{
-          display: 'flex',
-          gap: 4,
-          marginBottom: 24,
-          borderBottom: '1px solid #ddd',
-        }}
-      >
-        {(['stats', 'affiliates', 'payouts', 'top'] as Tab[]).map((t) => (
-          <button key={t} style={tabStyle(t)} onClick={() => setTab(t)}>
-            {t === 'top'
-              ? 'Top Affiliates'
-              : t.charAt(0).toUpperCase() + t.slice(1)}
+    <div className="min-h-screen bg-background text-text-primary p-6 md:p-12">
+      <div className="max-w-6xl mx-auto space-y-8">
+        
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 glass-panel p-6">
+          <div>
+            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-teal-500">
+              Admin Portal
+            </h1>
+            <p className="text-text-secondary mt-1">Manage affiliates, payouts, and system stats.</p>
+          </div>
+          <button 
+            onClick={handleLogout} 
+            className="px-6 py-2 rounded-xl border border-red-500/50 text-red-400 hover:bg-red-500/10 transition-colors"
+          >
+            Logout
           </button>
-        ))}
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-2 p-1 bg-surface/50 rounded-2xl border border-border/50 max-w-fit mx-auto sm:mx-0 overflow-x-auto">
+          {(['stats', 'affiliates', 'payouts', 'top'] as Tab[]).map((t) => (
+            <button 
+              key={t} 
+              onClick={() => setTab(t)}
+              className={`px-6 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 whitespace-nowrap ${
+                tab === t 
+                  ? 'bg-gradient-to-r from-primary to-indigo-600 text-white shadow-lg shadow-primary/25' 
+                  : 'text-text-secondary hover:text-text-primary hover:bg-surface'
+              }`}
+            >
+              {t === 'top' ? 'Top Affiliates' : t.charAt(0).toUpperCase() + t.slice(1)}
+            </button>
+          ))}
+        </div>
+
+        {actionMsg && (
+          <div className="bg-emerald-500/10 border border-emerald-500/50 text-emerald-400 p-4 rounded-xl text-sm animate-fade-in-up">
+            {actionMsg}
+          </div>
+        )}
+
+        {/* Content Area */}
+        <div className="animate-fade-in-up min-h-[400px]">
+          {loading ? (
+            <div className="flex justify-center p-20 text-primary">
+              <svg className="animate-spin h-10 w-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+          ) : (
+            <>
+              {tab === 'stats' && stats && <StatsTab stats={stats} />}
+              {tab === 'affiliates' && <AffiliatesTab affiliates={affiliates} search={search} onSearchChange={setSearch} />}
+              {tab === 'payouts' && <PayoutsTab payouts={payouts} payoutStatus={payoutStatus} onStatusChange={setPayoutStatus} onAction={handlePayout} />}
+              {tab === 'top' && <TopAffiliatesTab topAffiliates={topAffiliates} />}
+            </>
+          )}
+        </div>
+
       </div>
-
-      {actionMsg && (
-        <p style={{ color: 'green', marginBottom: 12 }}>{actionMsg}</p>
-      )}
-      {loading && <p>Loading...</p>}
-
-      {!loading && tab === 'stats' && stats && <StatsTab stats={stats} />}
-
-      {!loading && tab === 'affiliates' && (
-        <AffiliatesTab
-          affiliates={affiliates}
-          search={search}
-          onSearchChange={setSearch}
-        />
-      )}
-
-      {!loading && tab === 'payouts' && (
-        <PayoutsTab
-          payouts={payouts}
-          payoutStatus={payoutStatus}
-          onStatusChange={setPayoutStatus}
-          onAction={handlePayout}
-        />
-      )}
-
-      {!loading && tab === 'top' && (
-        <TopAffiliatesTab topAffiliates={topAffiliates} />
-      )}
     </div>
   );
 };

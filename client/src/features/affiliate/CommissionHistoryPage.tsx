@@ -24,107 +24,94 @@ export const CommissionHistoryPage = () => {
       .finally(() => setLoading(false));
   }, [page, status]);
 
+  const getStatusColor = (s: string) => {
+    switch (s) {
+      case 'approved': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+      case 'paid': return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+      case 'rejected': return 'bg-red-500/10 text-red-400 border-red-500/20';
+      default: return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+    }
+  };
+
   return (
-    <div style={{ maxWidth: 800, margin: '40px auto', padding: 24 }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          marginBottom: 16,
-        }}
-      >
-        <h1>Commission History</h1>
-        <Link to="/dashboard">← Dashboard</Link>
-      </div>
-      <select
-        value={status}
-        onChange={(e) => {
-          setStatus(e.target.value);
-          setPage(1);
-        }}
-        style={{ padding: 8, marginBottom: 16 }}
-      >
-        {STATUS_OPTIONS.map((s) => (
-          <option key={s} value={s}>
-            {s || 'All Statuses'}
-          </option>
-        ))}
-      </select>
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ background: '#f5f5f5' }}>
-              {['Purchase Amount', 'Commission', 'Status', 'Description', 'Date'].map(
-                (h) => (
-                  <th
-                    key={h}
-                    style={{
-                      padding: 10,
-                      textAlign: 'left',
-                      borderBottom: '1px solid #ddd',
-                    }}
-                  >
-                    {h}
-                  </th>
-                ),
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {commissions.map((c) => (
-              <tr key={c.id}>
-                <td
-                  style={{ padding: 10, borderBottom: '1px solid #eee' }}
-                >
-                  ${Number(c.purchase.amount).toFixed(2)}
-                </td>
-                <td
-                  style={{ padding: 10, borderBottom: '1px solid #eee' }}
-                >
-                  ${Number(c.amount).toFixed(2)}
-                </td>
-                <td
-                  style={{ padding: 10, borderBottom: '1px solid #eee' }}
-                >
-                  {c.status}
-                </td>
-                <td
-                  style={{ padding: 10, borderBottom: '1px solid #eee' }}
-                >
-                  {c.description || '-'}
-                </td>
-                <td
-                  style={{ padding: 10, borderBottom: '1px solid #eee' }}
-                >
-                  {new Date(c.createdAt).toLocaleDateString()}
-                </td>
-              </tr>
+    <div className="min-h-screen bg-background text-text-primary p-6 md:p-12">
+      <div className="max-w-6xl mx-auto space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 glass-panel p-6">
+          <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-indigo-400">
+            Commission History
+          </h1>
+          <Link to="/dashboard" className="px-5 py-2 rounded-xl bg-surface hover:bg-surface-hover border border-border transition-colors">
+            ← Dashboard
+          </Link>
+        </div>
+
+        <div className="glass-panel p-6">
+          <select
+            value={status}
+            onChange={(e) => {
+              setStatus(e.target.value);
+              setPage(1);
+            }}
+            className="premium-input mb-6 max-w-xs appearance-none"
+          >
+            {STATUS_OPTIONS.map((s) => (
+              <option key={s} value={s}>
+                {s ? s.charAt(0).toUpperCase() + s.slice(1) : 'All Statuses'}
+              </option>
             ))}
-            {commissions.length === 0 && (
-              <tr>
-                <td
-                  colSpan={5}
-                  style={{
-                    padding: 20,
-                    textAlign: 'center',
-                    color: '#999',
-                  }}
-                >
-                  No commissions found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      )}
-      <Pagination
-        page={page}
-        totalPages={totalPages}
-        onPrev={() => setPage((p) => Math.max(1, p - 1))}
-        onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
-      />
+          </select>
+
+          {loading ? (
+            <div className="flex justify-center p-12 text-primary">
+              <svg className="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-border/50 text-text-secondary text-sm uppercase tracking-wider">
+                    {['Purchase Amount', 'Commission', 'Status', 'Description', 'Date'].map((h) => (
+                      <th key={h} className="p-4 font-medium">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/30">
+                  {commissions.map((c) => (
+                    <tr key={c.id} className="hover:bg-surface/50 transition-colors">
+                      <td className="p-4 text-text-secondary">${Number(c.purchase.amount).toFixed(2)}</td>
+                      <td className="p-4 font-bold text-primary">${Number(c.amount).toFixed(2)}</td>
+                      <td className="p-4">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(c.status)}`}>
+                          {c.status.charAt(0).toUpperCase() + c.status.slice(1)}
+                        </span>
+                      </td>
+                      <td className="p-4 text-text-secondary">{c.description || '-'}</td>
+                      <td className="p-4 text-text-secondary">{new Date(c.createdAt).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                  {commissions.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="p-8 text-center text-text-secondary">
+                        No commissions found.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPrev={() => setPage((p) => Math.max(1, p - 1))}
+          onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
+        />
+      </div>
     </div>
   );
 };

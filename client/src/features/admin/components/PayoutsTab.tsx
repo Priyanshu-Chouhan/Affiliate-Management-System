@@ -3,95 +3,70 @@ import type { AdminPayout } from '@/types';
 interface PayoutsTabProps {
   payouts: AdminPayout[];
   payoutStatus: string;
-  onStatusChange: (value: string) => void;
+  onStatusChange: (status: string) => void;
   onAction: (id: string, action: 'approve' | 'reject') => void;
 }
 
-const PAYOUT_STATUSES = ['pending', 'approved', 'rejected', 'paid'];
-
-export const PayoutsTab = ({
-  payouts,
-  payoutStatus,
-  onStatusChange,
-  onAction,
-}: PayoutsTabProps) => (
-  <>
+export const PayoutsTab = ({ payouts, payoutStatus, onStatusChange, onAction }: PayoutsTabProps) => (
+  <div className="glass-panel p-6">
     <select
       value={payoutStatus}
       onChange={(e) => onStatusChange(e.target.value)}
-      style={{ padding: 8, marginBottom: 16 }}
+      className="premium-input mb-6 max-w-xs appearance-none"
     >
-      {PAYOUT_STATUSES.map((s) => (
-        <option key={s} value={s}>
-          {s}
-        </option>
-      ))}
+      <option value="pending">Pending</option>
+      <option value="approved">Approved</option>
+      <option value="rejected">Rejected</option>
+      <option value="paid">Paid</option>
     </select>
-    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-      <thead>
-        <tr style={{ background: '#f5f5f5' }}>
-          {['Affiliate', 'Amount', 'Status', 'Requested', 'Actions'].map(
-            (h) => (
-              <th
-                key={h}
-                style={{
-                  padding: 10,
-                  textAlign: 'left',
-                  borderBottom: '1px solid #ddd',
-                }}
-              >
-                {h}
-              </th>
-            ),
+
+    <div className="overflow-x-auto">
+      <table className="w-full text-left border-collapse">
+        <thead>
+          <tr className="border-b border-border/50 text-text-secondary text-sm uppercase tracking-wider">
+            {['Affiliate', 'Amount', 'Date', 'Action'].map((h) => (
+              <th key={h} className="p-4 font-medium">{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border/30">
+          {payouts.map((p) => (
+            <tr key={p.id} className="hover:bg-surface/50 transition-colors">
+              <td className="p-4">
+                <div className="font-medium text-white">{p.affiliate.name}</div>
+                <div className="text-sm text-text-secondary">{p.affiliate.email}</div>
+              </td>
+              <td className="p-4 font-bold text-emerald-400">${Number(p.amount).toFixed(2)}</td>
+              <td className="p-4 text-text-secondary">{new Date(p.requestedAt).toLocaleDateString()}</td>
+              <td className="p-4">
+                {p.status === 'pending' ? (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => onAction(p.id, 'approve')}
+                      className="px-4 py-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 rounded-lg text-sm font-medium transition-colors"
+                    >
+                      Approve
+                    </button>
+                    <button
+                      onClick={() => onAction(p.id, 'reject')}
+                      className="px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 rounded-lg text-sm font-medium transition-colors"
+                    >
+                      Reject
+                    </button>
+                  </div>
+                ) : (
+                  <span className="text-sm text-text-secondary italic">Processed</span>
+                )}
+              </td>
+            </tr>
+          ))}
+          {payouts.length === 0 && (
+            <tr>
+              <td colSpan={4} className="p-8 text-center text-text-secondary">No payouts found for this status.</td>
+            </tr>
           )}
-        </tr>
-      </thead>
-      <tbody>
-        {payouts.map((p) => (
-          <tr key={p.id}>
-            <td style={{ padding: 10, borderBottom: '1px solid #eee' }}>
-              {p.affiliate.name}
-            </td>
-            <td style={{ padding: 10, borderBottom: '1px solid #eee' }}>
-              ${Number(p.amount).toFixed(2)}
-            </td>
-            <td style={{ padding: 10, borderBottom: '1px solid #eee' }}>
-              {p.status}
-            </td>
-            <td style={{ padding: 10, borderBottom: '1px solid #eee' }}>
-              {new Date(p.requestedAt).toLocaleDateString()}
-            </td>
-            <td style={{ padding: 10, borderBottom: '1px solid #eee' }}>
-              {p.status === 'pending' && (
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button
-                    onClick={() => onAction(p.id, 'approve')}
-                    style={{ color: 'green' }}
-                  >
-                    Approve
-                  </button>
-                  <button
-                    onClick={() => onAction(p.id, 'reject')}
-                    style={{ color: 'red' }}
-                  >
-                    Reject
-                  </button>
-                </div>
-              )}
-            </td>
-          </tr>
-        ))}
-        {payouts.length === 0 && (
-          <tr>
-            <td
-              colSpan={5}
-              style={{ padding: 20, textAlign: 'center', color: '#999' }}
-            >
-              No payouts
-            </td>
-          </tr>
-        )}
-      </tbody>
-    </table>
-  </>
+        </tbody>
+      </table>
+    </div>
+  </div>
 );
