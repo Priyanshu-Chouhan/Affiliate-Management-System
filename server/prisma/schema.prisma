@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  user
+  admin
+}
+
+enum ReferralStatus {
+  pending
+  purchased
+}
+
+enum PurchaseStatus {
+  success
+  failed
+  cancelled
+}
+
+enum CommissionStatus {
+  pending
+  approved
+  paid
+  rejected
+}
+
+enum PayoutStatus {
+  pending
+  approved
+  rejected
+  paid
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         Role     @default(user)
+  referralCode String   @unique @map("referral_code")
+  referredById String?  @map("referred_by")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  referredBy       User?          @relation("UserReferrer", fields: [referredById], references: [id])
+  referredUsers    User[]         @relation("UserReferrer")
+  referralsGiven   Referral[]     @relation("ReferrerRelation")
+  referralReceived Referral?      @relation("ReferredUserRelation")
+  purchases        Purchase[]
+  commissions      Commission[]
+  payoutRequests   PayoutRequest[]
+
+  @@map("users")
+}
+
+model Referral {
+  id             String         @id @default(uuid())
+  referrerId     String         @map("referrer_id")
+  referredUserId String         @unique @map("referred_user_id")
+  status         ReferralStatus @default(pending)
+  createdAt      DateTime       @default(now()) @map("created_at")
+
+  referrer     User         @relation("ReferrerRelation", fields: [referrerId], references: [id])
+  referredUser User         @relation("ReferredUserRelation", fields: [referredUserId], references: [id])
+  commissions  Commission[]
+
+  @@map("referrals")
+}
+
+model Purchase {
+  id        String         @id @default(uuid())
+  userId    String         @map("user_id")
+  amount    Decimal        @db.Decimal(10, 2)
+  status    PurchaseStatus
+  createdAt DateTime       @default(now()) @map("created_at")
+
+  user       User        @relation(fields: [userId], references: [id])
+  commission Commission?
+
+  @@map("purchases")
+}
+
+model Commission {
+  id          String           @id @default(uuid())
+  affiliateId String           @map("affiliate_id")
+  referralId  String           @map("referral_id")
+  purchaseId  String           @unique @map("purchase_id")
+  amount      Decimal          @db.Decimal(10, 2)
+  status      CommissionStatus @default(pending)
+  createdAt   DateTime         @default(now()) @map("created_at")
+
+  affiliate User     @relation(fields: [affiliateId], references: [id])
+  referral  Referral @relation(fields: [referralId], references: [id])
+  purchase  Purchase @relation(fields: [purchaseId], references: [id])
+
+  @@map("commissions")
+}
+
+model PayoutRequest {
+  id          String       @id @default(uuid())
+  affiliateId String       @map("affiliate_id")
+  amount      Decimal      @db.Decimal(10, 2)
+  status      PayoutStatus @default(pending)
+  requestedAt DateTime     @default(now()) @map("requested_at")
+  processedAt DateTime?    @map("processed_at")
+
+  affiliate User @relation(fields: [affiliateId], references: [id])
+
+  @@map("payout_requests")
+}
+
+model Setting {
+  key   String @id
+  value String
+
+  @@map("settings")
+}

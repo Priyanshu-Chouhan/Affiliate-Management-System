@@ -2,7 +2,9 @@ import axiosClient from './axiosClient';
 
 export const affiliateApi = {
   getDashboard: () => axiosClient.get('/affiliate/dashboard'),
-  getReferrals: () => axiosClient.get('/affiliate/referrals'),
-  getCommissions: () => axiosClient.get('/affiliate/commissions'),
   getReferralLink: () => axiosClient.get('/affiliate/referral-link'),
+  getReferrals: (params?: { page?: number; search?: string; sort?: string }) =>
+    axiosClient.get('/affiliate/referrals', { params }),
+  getCommissions: (params?: { page?: number; status?: string; sort?: string }) =>
+    axiosClient.get('/affiliate/commissions', { params }),
 };
