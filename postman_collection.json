@@ -1,0 +1,146 @@
+{
+	"info": {
+		"_postman_id": "c13d8d64-9b2f-4c59-867c-17937e178129",
+		"name": "Affiliate Management System",
+		"description": "API Documentation for Affiliate Management System (PERN Stack).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\",\n  \"referralCode\": \"OPTIONAL_CODE\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/auth/register", "host": ["{{base_url}}"], "path": ["api", "auth", "register"] }
+					}
+				},
+				{
+					"name": "Login User",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/api/auth/login", "host": ["{{base_url}}"], "path": ["api", "auth", "login"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "Affiliate",
+			"item": [
+				{
+					"name": "Get Dashboard Stats",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+						"url": { "raw": "{{base_url}}/api/affiliate/dashboard", "host": ["{{base_url}}"], "path": ["api", "affiliate", "dashboard"] }
+					}
+				},
+				{
+					"name": "Get Referral Link",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+						"url": { "raw": "{{base_url}}/api/affiliate/referral-link", "host": ["{{base_url}}"], "path": ["api", "affiliate", "referral-link"] }
+					}
+				},
+				{
+					"name": "Get Referral History",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+						"url": { "raw": "{{base_url}}/api/affiliate/referrals?page=1&search=", "host": ["{{base_url}}"], "path": ["api", "affiliate", "referrals"], "query": [ { "key": "page", "value": "1" } ] }
+					}
+				},
+				{
+					"name": "Get Commission History",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+						"url": { "raw": "{{base_url}}/api/affiliate/commissions?page=1&status=pending", "host": ["{{base_url}}"], "path": ["api", "affiliate", "commissions"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "Payout",
+			"item": [
+				{
+					"name": "Request Payout",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+						"body": { "mode": "raw", "raw": "{\n  \"amount\": 50\n}" },
+						"url": { "raw": "{{base_url}}/api/payout", "host": ["{{base_url}}"], "path": ["api", "payout"] }
+					}
+				},
+				{
+					"name": "Get Payout History",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+						"url": { "raw": "{{base_url}}/api/payout/history", "host": ["{{base_url}}"], "path": ["api", "payout", "history"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Get Platform Stats",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Authorization", "value": "Bearer {{admin_jwt_token}}" } ],
+						"url": { "raw": "{{base_url}}/api/admin/stats", "host": ["{{base_url}}"], "path": ["api", "admin", "stats"] }
+					}
+				},
+				{
+					"name": "Approve Payout",
+					"request": {
+						"method": "PATCH",
+						"header": [ { "key": "Authorization", "value": "Bearer {{admin_jwt_token}}" } ],
+						"url": { "raw": "{{base_url}}/api/admin/payouts/:id/approve", "host": ["{{base_url}}"], "path": ["api", "admin", "payouts", ":id", "approve"], "variable": [ { "key": "id", "value": "payout_id_here" } ] }
+					}
+				},
+				{
+					"name": "Reject Payout",
+					"request": {
+						"method": "PATCH",
+						"header": [ { "key": "Authorization", "value": "Bearer {{admin_jwt_token}}" } ],
+						"url": { "raw": "{{base_url}}/api/admin/payouts/:id/reject", "host": ["{{base_url}}"], "path": ["api", "admin", "payouts", ":id", "reject"], "variable": [ { "key": "id", "value": "payout_id_here" } ] }
+					}
+				}
+			]
+		},
+		{
+			"name": "Purchase Simulation",
+			"item": [
+				{
+					"name": "Simulate Purchase",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+						"body": { "mode": "raw", "raw": "{\n  \"amount\": 1000,\n  \"status\": \"success\"\n}" },
+						"url": { "raw": "{{base_url}}/api/purchases", "host": ["{{base_url}}"], "path": ["api", "purchases"] }
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{ "key": "base_url", "value": "http://localhost:4000", "type": "string" },
+		{ "key": "jwt_token", "value": "your_token_here", "type": "string" },
+		{ "key": "admin_jwt_token", "value": "your_admin_token_here", "type": "string" }
+	]
+}
