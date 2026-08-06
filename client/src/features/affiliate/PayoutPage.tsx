@@ -1,44 +1,50 @@
-import { useEffect, useState, FormEvent } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { affiliateApi } from '@/api/affiliate.api';
-import { payoutApi } from '@/api/payout.api';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { 
+  useGetDashboardQuery, 
+  useGetPayoutHistoryQuery, 
+  useRequestPayoutMutation 
+} from '@/store/api';
 import type { PayoutRequest } from '@/types';
 
+const payoutSchema = z.object({
+  amount: z.number().min(1, { message: "Amount must be at least 1" }),
+});
+
+type PayoutFormValues = z.infer<typeof payoutSchema>;
+
 export const PayoutPage = () => {
-  const [balance, setBalance] = useState(0);
-  const [amount, setAmount] = useState('');
-  const [history, setHistory] = useState<PayoutRequest[]>([]);
-  const [error, setError] = useState('');
+  const { data: dashboardData } = useGetDashboardQuery(undefined);
+  const { data: historyData } = useGetPayoutHistoryQuery(undefined);
+  const [requestPayout, { isLoading }] = useRequestPayoutMutation();
   const [success, setSuccess] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  const loadData = () => {
-    affiliateApi
-      .getDashboard()
-      .then((res) => setBalance(res.data.data.availableBalance));
-    payoutApi.getHistory().then((res) => setHistory(res.data.data));
-  };
+  const balance = dashboardData?.data?.availableBalance || 0;
+  const history: PayoutRequest[] = historyData?.data || [];
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  const {
+    register,
+    handleSubmit,
+    setError,
+    reset,
+    formState: { errors },
+  } = useForm<PayoutFormValues>({
+    resolver: zodResolver(payoutSchema),
+  });
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setError('');
+  const onSubmit = async (data: PayoutFormValues) => {
     setSuccess('');
-    setLoading(true);
     try {
-      await payoutApi.requestPayout({ amount: parseFloat(amount) });
+      await requestPayout(data).unwrap();
       setSuccess('Payout request submitted!');
-      setAmount('');
-      loadData();
-    } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { error?: string } } })
-        ?.response?.data?.error;
-      setError(msg ?? 'Request failed');
-    } finally {
-      setLoading(false);
+      reset();
+    } catch (err: any) {
+      setError('root', { 
+        message: err.data?.error || 'Request failed' 
+      });
     }
   };
 
@@ -77,7 +83,7 @@ export const PayoutPage = () => {
               <p className="text-4xl font-bold text-white">${Number(balance).toFixed(2)}</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="glass-panel p-6 space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="glass-panel p-6 space-y-4">
               <h2 className="text-lg font-medium text-white mb-4">Request Payout</h2>
               
               <div>
@@ -85,20 +91,18 @@ export const PayoutPage = () => {
                 <input
                   type="number"
                   placeholder="0.00"
-                  value={amount}
-                  min={1}
                   step="0.01"
-                  required
-                  onChange={(e) => setAmount(e.target.value)}
-                  className="premium-input text-lg"
+                  className={`premium-input text-lg ${errors.amount ? 'border-red-500' : ''}`}
+                  {...register('amount', { valueAsNumber: true })}
                 />
+                {errors.amount && <p className="text-red-400 text-xs mt-1">{errors.amount.message}</p>}
               </div>
 
-              {error && <div className="text-red-400 text-sm bg-red-500/10 p-3 rounded-lg border border-red-500/20">{error}</div>}
+              {errors.root && <div className="text-red-400 text-sm bg-red-500/10 p-3 rounded-lg border border-red-500/20">{errors.root.message}</div>}
               {success && <div className="text-emerald-400 text-sm bg-emerald-500/10 p-3 rounded-lg border border-emerald-500/20">{success}</div>}
 
-              <button type="submit" disabled={loading || parseFloat(amount || '0') > balance} className="premium-button mt-4">
-                {loading ? 'Submitting...' : 'Request Payout'}
+              <button type="submit" disabled={isLoading} className="premium-button mt-4">
+                {isLoading ? 'Submitting...' : 'Request Payout'}
               </button>
             </form>
           </div>

@@ -1,30 +1,55 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks';
-import { authApi } from '@/api/auth.api';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { useLoginMutation } from '@/store/api';
+import { useDispatch } from 'react-redux';
+import { setCredentials } from '@/store/authSlice';
+
+const loginSchema = z.object({
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(1, { message: "Password is required" }),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const { login } = useAuth();
+  const [loginApi, { isLoading }] = useLoginMutation();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const onSubmit = async (data: LoginFormValues) => {
     try {
-      const res = await authApi.login({ email, password });
-      login(res.data.data.accessToken, res.data.data.refreshToken, res.data.data.user);
-      navigate(res.data.data.user.role === 'admin' ? '/admin' : '/dashboard');
+      const res = await loginApi(data).unwrap();
+      
+      // Update Redux state
+      dispatch(setCredentials({
+        user: res.data.user,
+        accessToken: res.data.accessToken,
+        refreshToken: res.data.refreshToken,
+      }));
+      
+      navigate(res.data.user.role === 'admin' ? '/admin' : '/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Login failed');
+      setError('root', { 
+        message: err.data?.error || 'Login failed' 
+      });
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background relative overflow-hidden">
-      {/* Dynamic Background Elements */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none" />
 
@@ -33,37 +58,34 @@ export const LoginPage = () => {
           <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-indigo-400 mb-2">
             Welcome Back
           </h1>
-          <p className="text-text-secondary">Sign in to your affiliate account</p>
+          <p className="text-text-secondary">Sign in to your affiliate account (RTK Version)</p>
         </div>
 
-        {error && (
+        {errors.root && (
           <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-4 rounded-xl mb-6 text-sm">
-            {error}
+            {errors.root.message}
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div>
             <label className="block text-sm font-medium text-text-secondary mb-1">Email Address</label>
             <input
               type="email"
-              required
-              className="premium-input"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              className={`premium-input ${errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500/50' : ''}`}
               placeholder="you@example.com"
+              {...register('email')}
             />
+            {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-text-secondary mb-1">Password</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                required
-                className="premium-input pr-10"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                className={`premium-input pr-10 ${errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500/50' : ''}`}
                 placeholder="••••••••"
+                {...register('password')}
               />
               <button
                 type="button"
@@ -82,9 +104,10 @@ export const LoginPage = () => {
                 )}
               </button>
             </div>
+            {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password.message}</p>}
           </div>
-          <button type="submit" className="premium-button mt-4">
-            Sign In
+          <button type="submit" disabled={isLoading} className="premium-button mt-4">
+            {isLoading ? 'Signing In...' : 'Sign In'}
           </button>
         </form>
 

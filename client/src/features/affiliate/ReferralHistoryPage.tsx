@@ -1,26 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { affiliateApi } from '@/api/affiliate.api';
+import { useGetReferralsQuery } from '@/store/api';
 import { Pagination } from '@/components/ui';
 import type { Referral } from '@/types';
 
 export const ReferralHistoryPage = () => {
-  const [referrals, setReferrals] = useState<Referral[]>([]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(true);
+  
+  const { data, isLoading: loading } = useGetReferralsQuery({ page, search });
 
-  useEffect(() => {
-    setLoading(true);
-    affiliateApi
-      .getReferrals({ page, search })
-      .then((res) => {
-        setReferrals(res.data.data.data);
-        setTotalPages(res.data.data.meta.totalPages);
-      })
-      .finally(() => setLoading(false));
-  }, [page, search]);
+  const referrals: Referral[] = data?.data?.data || [];
+  const totalPages = data?.data?.meta?.totalPages || 1;
 
   return (
     <div className="min-h-screen bg-background text-text-primary p-6 md:p-12">

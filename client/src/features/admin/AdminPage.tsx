@@ -1,14 +1,14 @@
-import { useEffect, useState } from 'react';
-import type React from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { adminApi } from '@/api/admin.api';
 import { useAuth } from '@/hooks';
-import type {
-  AdminStats,
-  AdminAffiliate,
-  AdminPayout,
-  TopAffiliate,
-} from '@/types';
+import { 
+  useGetAdminStatsQuery,
+  useGetAdminAffiliatesQuery,
+  useGetAdminPayoutsQuery,
+  useGetAdminTopAffiliatesQuery,
+  useApprovePayoutMutation,
+  useRejectPayoutMutation
+} from '@/store/api';
 import {
   StatsTab,
   AffiliatesTab,
@@ -22,54 +22,24 @@ export const AdminPage = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('stats');
-  const [stats, setStats] = useState<AdminStats | null>(null);
-  const [affiliates, setAffiliates] = useState<AdminAffiliate[]>([]);
-  const [payouts, setPayouts] = useState<AdminPayout[]>([]);
-  const [topAffiliates, setTopAffiliates] = useState<TopAffiliate[]>([]);
+  
   const [search, setSearch] = useState('');
   const [payoutStatus, setPayoutStatus] = useState('pending');
-  const [loading, setLoading] = useState(false);
   const [actionMsg, setActionMsg] = useState('');
 
-  useEffect(() => {
-    if (tab === 'stats') {
-      setLoading(true);
-      adminApi
-        .getStats()
-        .then((r) => setStats(r.data.data))
-        .finally(() => setLoading(false));
-    }
-    if (tab === 'affiliates') {
-      setLoading(true);
-      adminApi
-        .getAffiliates({ search })
-        .then((r) => setAffiliates(r.data.data.data))
-        .finally(() => setLoading(false));
-    }
-    if (tab === 'payouts') {
-      setLoading(true);
-      adminApi
-        .getPayouts(payoutStatus)
-        .then((r) => setPayouts(r.data.data))
-        .finally(() => setLoading(false));
-    }
-    if (tab === 'top') {
-      setLoading(true);
-      adminApi
-        .getTopAffiliates()
-        .then((r) => setTopAffiliates(r.data.data))
-        .finally(() => setLoading(false));
-    }
-  }, [tab, search, payoutStatus]);
+  const { data: statsData, isLoading: loadingStats } = useGetAdminStatsQuery(undefined, { skip: tab !== 'stats' });
+  const { data: affiliatesData, isLoading: loadingAffiliates } = useGetAdminAffiliatesQuery({ search }, { skip: tab !== 'affiliates' });
+  const { data: payoutsData, isLoading: loadingPayouts } = useGetAdminPayoutsQuery({ status: payoutStatus }, { skip: tab !== 'payouts' });
+  const { data: topAffiliatesData, isLoading: loadingTop } = useGetAdminTopAffiliatesQuery(undefined, { skip: tab !== 'top' });
+
+  const [approvePayout] = useApprovePayoutMutation();
+  const [rejectPayout] = useRejectPayoutMutation();
 
   const handlePayout = async (id: string, action: 'approve' | 'reject') => {
     try {
-      if (action === 'approve') await adminApi.approvePayout(id);
-      else await adminApi.rejectPayout(id);
+      if (action === 'approve') await approvePayout(id).unwrap();
+      else await rejectPayout(id).unwrap();
       setActionMsg(`Payout ${action}d successfully`);
-      adminApi
-        .getPayouts(payoutStatus)
-        .then((r) => setPayouts(r.data.data));
     } catch {
       setActionMsg('Action failed');
     }
@@ -80,6 +50,8 @@ export const AdminPage = () => {
     logout();
     navigate('/login');
   };
+
+  const loading = loadingStats || loadingAffiliates || loadingPayouts || loadingTop;
 
   return (
     <div className="min-h-screen bg-background text-text-primary p-6 md:p-12">
@@ -135,10 +107,10 @@ export const AdminPage = () => {
             </div>
           ) : (
             <>
-              {tab === 'stats' && stats && <StatsTab stats={stats} />}
-              {tab === 'affiliates' && <AffiliatesTab affiliates={affiliates} search={search} onSearchChange={setSearch} />}
-              {tab === 'payouts' && <PayoutsTab payouts={payouts} payoutStatus={payoutStatus} onStatusChange={setPayoutStatus} onAction={handlePayout} />}
-              {tab === 'top' && <TopAffiliatesTab topAffiliates={topAffiliates} />}
+              {tab === 'stats' && statsData?.data && <StatsTab stats={statsData.data} />}
+              {tab === 'affiliates' && <AffiliatesTab affiliates={affiliatesData?.data?.data || []} search={search} onSearchChange={setSearch} />}
+              {tab === 'payouts' && <PayoutsTab payouts={payoutsData?.data || []} payoutStatus={payoutStatus} onStatusChange={setPayoutStatus} onAction={handlePayout} />}
+              {tab === 'top' && <TopAffiliatesTab topAffiliates={topAffiliatesData?.data || []} />}
             </>
           )}
         </div>

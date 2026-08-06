@@ -1,28 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { affiliateApi } from '@/api/affiliate.api';
+import { useGetCommissionsQuery } from '@/store/api';
 import { Pagination } from '@/components/ui';
 import type { Commission } from '@/types';
 
 const STATUS_OPTIONS = ['', 'pending', 'approved', 'paid', 'rejected'];
 
 export const CommissionHistoryPage = () => {
-  const [commissions, setCommissions] = useState<Commission[]>([]);
   const [status, setStatus] = useState('');
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(true);
+  
+  const { data, isLoading: loading } = useGetCommissionsQuery({ 
+    page, 
+    status: status || undefined 
+  });
 
-  useEffect(() => {
-    setLoading(true);
-    affiliateApi
-      .getCommissions({ page, status: status || undefined })
-      .then((res) => {
-        setCommissions(res.data.data.data);
-        setTotalPages(res.data.data.meta.totalPages);
-      })
-      .finally(() => setLoading(false));
-  }, [page, status]);
+  const commissions: Commission[] = data?.data?.data || [];
+  const totalPages = data?.data?.meta?.totalPages || 1;
 
   const getStatusColor = (s: string) => {
     switch (s) {

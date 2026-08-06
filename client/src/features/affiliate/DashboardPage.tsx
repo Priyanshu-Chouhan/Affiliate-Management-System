@@ -1,27 +1,19 @@
-import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { affiliateApi } from '@/api/affiliate.api';
-import { purchaseApi } from '@/api/purchase.api';
 import { useAuth } from '@/hooks';
-import type { DashboardStats } from '@/types';
+import { 
+  useGetDashboardQuery, 
+  useGetReferralLinkQuery, 
+  useSimulatePurchaseMutation 
+} from '@/store/api';
 import { StatCard, ReferralLinkBox } from './components';
 
 export const DashboardPage = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [referralLink, setReferralLink] = useState('');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    Promise.all([affiliateApi.getDashboard(), affiliateApi.getReferralLink()])
-      .then(([statsRes, linkRes]) => {
-        setStats(statsRes.data.data);
-        setReferralLink(linkRes.data.data.link);
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
+  
+  const { data: dashboardData, isLoading: isLoadingStats } = useGetDashboardQuery(undefined);
+  const { data: linkData, isLoading: isLoadingLink } = useGetReferralLinkQuery(undefined);
+  const [simulatePurchase, { isLoading: isPurchasing }] = useSimulatePurchaseMutation();
 
   const handleLogout = () => {
     logout();
@@ -30,24 +22,17 @@ export const DashboardPage = () => {
 
   const handleSimulatePurchase = async () => {
     try {
-      setLoading(true);
-      await purchaseApi.simulatePurchase({ amount: 1000, status: 'success' });
-      // Refresh dashboard stats
-      const [statsRes, linkRes] = await Promise.all([
-        affiliateApi.getDashboard(),
-        affiliateApi.getReferralLink(),
-      ]);
-      setStats(statsRes.data.data);
-      setReferralLink(linkRes.data.data.link);
+      await simulatePurchase({ amount: 1000, status: 'success' }).unwrap();
       alert('Purchase Successful! The referrer has received a commission.');
     } catch (err: any) {
-      alert('Error making purchase: ' + (err.response?.data?.error || err.message));
-    } finally {
-      setLoading(false);
+      alert('Error making purchase: ' + (err.data?.error || err.message));
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (isLoadingStats || isLoadingLink) return <p className="p-6 text-text-secondary">Loading dashboard...</p>;
+
+  const stats = dashboardData?.data;
+  const referralLink = linkData?.data?.link || '';
 
   return (
     <div className="min-h-screen bg-background text-text-primary p-6 md:p-12">
@@ -95,9 +80,14 @@ export const DashboardPage = () => {
           
           <button 
             onClick={handleSimulatePurchase}
-            className="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold shadow-lg shadow-emerald-500/25 transition-all duration-300 active:scale-95"
+            disabled={isPurchasing}
+            className={`px-6 py-3 rounded-xl font-bold shadow-lg transition-all duration-300 active:scale-95 ${
+              isPurchasing 
+                ? 'bg-emerald-800 text-emerald-200 cursor-not-allowed'
+                : 'bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white shadow-emerald-500/25'
+            }`}
           >
-            🛒 Simulate Purchase ($1000)
+            {isPurchasing ? 'Processing...' : '🛒 Simulate Purchase ($1000)'}
           </button>
         </div>
       </div>

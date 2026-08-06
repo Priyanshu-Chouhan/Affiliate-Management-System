@@ -8,11 +8,12 @@ import {
 } from '@/features/affiliate';
 import { AdminPage } from '@/features/admin';
 import { ProtectedRoute } from './ProtectedRoute';
-import { useAuth } from '@/hooks';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store';
 
 export const AppRoutes = () => {
-  const { token, user } = useAuth();
-  const isAuth = !!token;
+  const { accessToken, user } = useSelector((state: RootState) => state.auth);
+  const isAuth = !!accessToken;
   const isAdmin = user?.role === 'admin';
 
   return (

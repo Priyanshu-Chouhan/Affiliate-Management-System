@@ -1,33 +1,68 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { useRegisterMutation } from '@/store/api';
+import { useDispatch } from 'react-redux';
+import { setCredentials } from '@/store/authSlice';
 import { useAuth } from '@/hooks';
-import { authApi } from '@/api/auth.api';
+
+const registerSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  referralCode: z.string().optional(),
+});
+
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export const RegisterPage = () => {
   const [searchParams] = useSearchParams();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [referralCode, setReferralCode] = useState(searchParams.get('ref') || '');
-  const [error, setError] = useState('');
-  const { login } = useAuth();
+  const [registerApi, { isLoading }] = useRegisterMutation();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { login: contextLogin } = useAuth();
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    setError,
+    setValue,
+    formState: { errors },
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  useEffect(() => {
+    const ref = searchParams.get('ref');
+    if (ref) {
+      setValue('referralCode', ref);
+    }
+  }, [searchParams, setValue]);
+
+  const onSubmit = async (data: RegisterFormValues) => {
     try {
-      const res = await authApi.register({ name, email, password, referralCode });
-      login(res.data.data.accessToken, res.data.data.refreshToken, res.data.data.user);
+      const res = await registerApi(data).unwrap();
+      
+      dispatch(setCredentials({
+        user: res.data.user,
+        accessToken: res.data.accessToken,
+        refreshToken: res.data.refreshToken,
+      }));
+      
+      contextLogin(res.data.accessToken, res.data.refreshToken, res.data.user);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Registration failed');
+      setError('root', { 
+        message: err.data?.error || 'Registration failed' 
+      });
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background relative overflow-hidden">
-      {/* Dynamic Background Elements */}
       <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none" />
 
@@ -36,49 +71,44 @@ export const RegisterPage = () => {
           <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-indigo-400 mb-2">
             Create Account
           </h1>
-          <p className="text-text-secondary">Join our affiliate program today</p>
+          <p className="text-text-secondary">Join our affiliate program today (RTK Version)</p>
         </div>
 
-        {error && (
+        {errors.root && (
           <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-4 rounded-xl mb-6 text-sm">
-            {error}
+            {errors.root.message}
           </div>
         )}
 
-        <form onSubmit={handleRegister} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-text-secondary mb-1">Full Name</label>
             <input
               type="text"
-              required
-              className="premium-input"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              className={`premium-input ${errors.name ? 'border-red-500' : ''}`}
               placeholder="John Doe"
+              {...register('name')}
             />
+            {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name.message}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-text-secondary mb-1">Email Address</label>
             <input
               type="email"
-              required
-              className="premium-input"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              className={`premium-input ${errors.email ? 'border-red-500' : ''}`}
               placeholder="you@example.com"
+              {...register('email')}
             />
+            {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-text-secondary mb-1">Password</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                required
-                minLength={6}
-                className="premium-input pr-10"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                className={`premium-input pr-10 ${errors.password ? 'border-red-500' : ''}`}
                 placeholder="••••••••"
+                {...register('password')}
               />
               <button
                 type="button"
@@ -97,19 +127,19 @@ export const RegisterPage = () => {
                 )}
               </button>
             </div>
+            {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password.message}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-text-secondary mb-1">Referral Code (Optional)</label>
             <input
               type="text"
               className="premium-input"
-              value={referralCode}
-              onChange={(e) => setReferralCode(e.target.value)}
               placeholder="ABC12345"
+              {...register('referralCode')}
             />
           </div>
-          <button type="submit" className="premium-button mt-6">
-            Create Account
+          <button type="submit" disabled={isLoading} className="premium-button mt-6">
+            {isLoading ? 'Creating Account...' : 'Create Account'}
           </button>
         </form>
 
