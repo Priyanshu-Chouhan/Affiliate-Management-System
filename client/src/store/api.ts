@@ -15,6 +15,7 @@ export const api = createApi({
       return headers;
     },
   }),
+  tagTypes: ['Dashboard', 'PayoutHistory', 'Admin', 'AdminPayouts'],
   endpoints: (builder) => ({
     login: builder.mutation({
       query: (credentials) => ({ url: 'auth/login', method: 'POST', body: credentials }),
