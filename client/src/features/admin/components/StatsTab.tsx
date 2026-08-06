@@ -1,4 +1,4 @@
-import { StatCard } from '@/components/ui';
+import { StatCard } from '@/components';
 import type { AdminStats } from '@/types';
 
 interface StatsTabProps {

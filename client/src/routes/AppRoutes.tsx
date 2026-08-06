@@ -8,6 +8,7 @@ import {
 } from '@/features/affiliate';
 import { AdminPage } from '@/features/admin';
 import { ProtectedRoute } from './ProtectedRoute';
+import { NotFoundPage } from './NotFoundPage';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
 
@@ -38,7 +39,8 @@ export const AppRoutes = () => {
         <Route path="/admin" element={<AdminPage />} />
       </Route>
 
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* 404 Page Not Found */}
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 };

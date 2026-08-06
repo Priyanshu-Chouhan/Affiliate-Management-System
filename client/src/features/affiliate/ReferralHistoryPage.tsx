@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetReferralsQuery } from '@/store/api';
-import { Pagination } from '@/components/ui';
+import { Pagination } from '@/components';
 import type { Referral } from '@/types';
 
 export const ReferralHistoryPage = () => {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetCommissionsQuery } from '@/store/api';
-import { Pagination } from '@/components/ui';
+import { Pagination } from '@/components';
 import type { Commission } from '@/types';
 
 const STATUS_OPTIONS = ['', 'pending', 'approved', 'paid', 'rejected'];

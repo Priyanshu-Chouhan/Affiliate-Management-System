@@ -1,4 +1,4 @@
-import { StatCard as BaseStatCard } from '@/components/ui';
+import { StatCard as BaseStatCard } from '@/components';
 
 interface AffiliateStatCardProps {
   label: string;
