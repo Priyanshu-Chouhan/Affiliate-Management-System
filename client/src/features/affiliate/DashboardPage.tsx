@@ -8,6 +8,7 @@ import {
   useSimulatePurchaseMutation 
 } from '@/store/api';
 import { StatCard, ReferralLinkBox } from './components';
+import { LoadingScreen } from '@/components';
 
 export const DashboardPage = () => {
   const dispatch = useDispatch();
@@ -32,7 +33,7 @@ export const DashboardPage = () => {
     }
   };
 
-  if (isLoadingStats || isLoadingLink) return <p className="p-6 text-text-secondary">Loading dashboard...</p>;
+  if (isLoadingStats || isLoadingLink) return <LoadingScreen />;
 
   const stats = dashboardData?.data;
   const referralLink = linkData?.data?.link || '';

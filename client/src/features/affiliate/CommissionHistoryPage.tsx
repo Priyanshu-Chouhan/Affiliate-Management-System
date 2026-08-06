@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetCommissionsQuery } from '@/store/api';
-import { Pagination } from '@/components';
+import { Pagination, LoadingScreen } from '@/components';
 import type { Commission } from '@/types';
 
 const STATUS_OPTIONS = ['', 'pending', 'approved', 'paid', 'rejected'];
@@ -26,6 +26,8 @@ export const CommissionHistoryPage = () => {
       default: return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
     }
   };
+
+  if (loading && !data) return <LoadingScreen />;
 
   return (
     <div className="min-h-screen bg-background text-text-primary p-6 md:p-12">

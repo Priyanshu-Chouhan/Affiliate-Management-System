@@ -8,6 +8,7 @@ import {
   useGetPayoutHistoryQuery, 
   useRequestPayoutMutation 
 } from '@/store/api';
+import { LoadingScreen } from '@/components';
 import type { PayoutRequest } from '@/types';
 
 const payoutSchema = z.object({
@@ -17,8 +18,8 @@ const payoutSchema = z.object({
 type PayoutFormValues = z.infer<typeof payoutSchema>;
 
 export const PayoutPage = () => {
-  const { data: dashboardData } = useGetDashboardQuery(undefined);
-  const { data: historyData } = useGetPayoutHistoryQuery(undefined);
+  const { data: dashboardData, isLoading: loadingDash } = useGetDashboardQuery(undefined);
+  const { data: historyData, isLoading: loadingHist } = useGetPayoutHistoryQuery(undefined);
   const [requestPayout, { isLoading }] = useRequestPayoutMutation();
   const [success, setSuccess] = useState('');
 
@@ -56,6 +57,8 @@ export const PayoutPage = () => {
       default: return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
     }
   };
+
+  if ((loadingDash || loadingHist) && (!dashboardData || !historyData)) return <LoadingScreen />;
 
   return (
     <div className="min-h-screen bg-background text-text-primary p-6 md:p-12">

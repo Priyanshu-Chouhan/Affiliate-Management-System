@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetReferralsQuery } from '@/store/api';
-import { Pagination } from '@/components';
+import { Pagination, LoadingScreen } from '@/components';
 import type { Referral } from '@/types';
 
 export const ReferralHistoryPage = () => {
@@ -12,6 +12,8 @@ export const ReferralHistoryPage = () => {
 
   const referrals: Referral[] = data?.data?.data || [];
   const totalPages = data?.data?.meta?.totalPages || 1;
+
+  if (loading && !data) return <LoadingScreen />;
 
   return (
     <div className="min-h-screen bg-background text-text-primary p-6 md:p-12">
