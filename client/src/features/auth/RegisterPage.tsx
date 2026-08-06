@@ -68,7 +68,7 @@ export const RegisterPage = () => {
           <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-indigo-400 mb-2">
             Create Account
           </h1>
-          <p className="text-text-secondary">Join our affiliate program today (RTK Version)</p>
+          <p className="text-text-secondary">Join our affiliate program today</p>
         </div>
 
         {errors.root && (

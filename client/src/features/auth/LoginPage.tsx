@@ -58,7 +58,7 @@ export const LoginPage = () => {
           <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-indigo-400 mb-2">
             Welcome Back
           </h1>
-          <p className="text-text-secondary">Sign in to your affiliate account (RTK Version)</p>
+          <p className="text-text-secondary">Sign in to your affiliate account</p>
         </div>
 
         {errors.root && (
