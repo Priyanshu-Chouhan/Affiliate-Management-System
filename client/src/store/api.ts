@@ -1,20 +1,67 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi, fetchBaseQuery, BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import type { RootState } from './index';
+import { setCredentials, logout } from './authSlice';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000/api';
 
+const baseQuery = fetchBaseQuery({
+  baseUrl: API_BASE,
+  prepareHeaders: (headers, { getState }) => {
+    const token = (getState() as RootState).auth.accessToken;
+    if (token) {
+      headers.set('authorization', `Bearer ${token}`);
+    }
+    return headers;
+  },
+});
+
+const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (args, api, extraOptions) => {
+  let result = await baseQuery(args, api, extraOptions);
+  
+  if (result.error && result.error.status === 401) {
+    const url = typeof args === 'string' ? args : args.url;
+    if (!url.includes('auth/login') && !url.includes('auth/register') && !url.includes('auth/refresh')) {
+      const refreshToken = (api.getState() as RootState).auth.refreshToken;
+      
+      if (refreshToken) {
+        const refreshResult = await baseQuery(
+          {
+            url: 'auth/refresh',
+            method: 'POST',
+            body: { refreshToken },
+          },
+          api,
+          extraOptions
+        );
+
+        if (refreshResult.data) {
+          const user = (api.getState() as RootState).auth.user;
+          const resData = refreshResult.data as any;
+          
+          api.dispatch(
+            setCredentials({
+              user: user!,
+              accessToken: resData.data.accessToken,
+              refreshToken: resData.data.refreshToken,
+            })
+          );
+          
+          // Retry original query
+          result = await baseQuery(args, api, extraOptions);
+        } else {
+          api.dispatch(logout());
+        }
+      } else {
+        api.dispatch(logout());
+      }
+    }
+  }
+  return result;
+};
+
 export const api = createApi({
   reducerPath: 'api',
-  baseQuery: fetchBaseQuery({
-    baseUrl: API_BASE,
-    prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as RootState).auth.accessToken;
-      if (token) {
-        headers.set('authorization', `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+  baseQuery: baseQueryWithReauth,
   tagTypes: ['Dashboard', 'PayoutHistory', 'Admin', 'AdminPayouts'],
   endpoints: (builder) => ({
     login: builder.mutation({

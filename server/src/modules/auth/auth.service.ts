@@ -69,7 +69,10 @@ export const refresh = async (token: string) => {
     const payload = verifyRefreshToken(token);
     const user = await db.user.findUnique({ where: { id: payload.userId } });
     if (!user) throw new AppError(401, 'Unauthorized');
-    return { accessToken: signAccessToken({ userId: user.id, role: user.role }) };
+    return { 
+      accessToken: signAccessToken({ userId: user.id, role: user.role }),
+      refreshToken: signRefreshToken({ userId: user.id, role: user.role })
+    };
   } catch {
     throw new AppError(401, 'Unauthorized');
   }
