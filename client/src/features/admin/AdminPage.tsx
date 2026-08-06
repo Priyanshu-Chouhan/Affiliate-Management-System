@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks';
+import { useDispatch } from 'react-redux';
+import { logout } from '@/store/authSlice';
 import { 
   useGetAdminStatsQuery,
   useGetAdminAffiliatesQuery,
@@ -19,7 +20,7 @@ import {
 type Tab = 'stats' | 'affiliates' | 'payouts' | 'top';
 
 export const AdminPage = () => {
-  const { logout } = useAuth();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('stats');
   
@@ -47,7 +48,7 @@ export const AdminPage = () => {
   };
 
   const handleLogout = () => {
-    logout();
+    dispatch(logout());
     navigate('/login');
   };
 

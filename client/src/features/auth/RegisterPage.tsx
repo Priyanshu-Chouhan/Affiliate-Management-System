@@ -6,7 +6,6 @@ import * as z from 'zod';
 import { useRegisterMutation } from '@/store/api';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '@/store/authSlice';
-import { useAuth } from '@/hooks';
 
 const registerSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -23,7 +22,6 @@ export const RegisterPage = () => {
   const [registerApi, { isLoading }] = useRegisterMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { login: contextLogin } = useAuth();
 
   const {
     register,
@@ -52,7 +50,6 @@ export const RegisterPage = () => {
         refreshToken: res.data.refreshToken,
       }));
       
-      contextLogin(res.data.accessToken, res.data.refreshToken, res.data.user);
       navigate('/dashboard');
     } catch (err: any) {
       setError('root', { 

@@ -1,5 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '@/store/authSlice';
+import type { RootState } from '@/store';
 import { 
   useGetDashboardQuery, 
   useGetReferralLinkQuery, 
@@ -8,7 +10,8 @@ import {
 import { StatCard, ReferralLinkBox } from './components';
 
 export const DashboardPage = () => {
-  const { user, logout } = useAuth();
+  const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.auth.user);
   const navigate = useNavigate();
   
   const { data: dashboardData, isLoading: isLoadingStats } = useGetDashboardQuery(undefined);
@@ -16,7 +19,7 @@ export const DashboardPage = () => {
   const [simulatePurchase, { isLoading: isPurchasing }] = useSimulatePurchaseMutation();
 
   const handleLogout = () => {
-    logout();
+    dispatch(logout());
     navigate('/login');
   };
 
