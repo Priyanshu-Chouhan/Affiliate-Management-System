@@ -14,6 +14,7 @@ export const PayoutsTab = ({ payouts, payoutStatus, onStatusChange, onAction }: 
       onChange={(e) => onStatusChange(e.target.value)}
       className="premium-input mb-6 max-w-xs appearance-none"
     >
+      <option value="">All</option>
       <option value="pending">Pending</option>
       <option value="approved">Approved</option>
       <option value="rejected">Rejected</option>

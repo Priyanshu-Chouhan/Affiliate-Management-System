@@ -15,9 +15,18 @@ import {
   AffiliatesTab,
   PayoutsTab,
   TopAffiliatesTab,
+  CommissionsTab,
 } from './components';
 
-type Tab = 'stats' | 'affiliates' | 'payouts' | 'top';
+type Tab = 'stats' | 'affiliates' | 'payouts' | 'commissions' | 'top';
+
+const TAB_LABELS: Record<Tab, string> = {
+  stats: 'Referral Statistics',
+  affiliates: 'All Affiliates',
+  payouts: 'Payout Requests',
+  commissions: 'Commission History',
+  top: 'Top Affiliates',
+};
 
 export const AdminPage = () => {
   const dispatch = useDispatch();
@@ -25,7 +34,7 @@ export const AdminPage = () => {
   const [tab, setTab] = useState<Tab>('stats');
   
   const [search, setSearch] = useState('');
-  const [payoutStatus, setPayoutStatus] = useState('pending');
+  const [payoutStatus, setPayoutStatus] = useState('');
   const [actionMsg, setActionMsg] = useState('');
 
   const { data: statsData, isLoading: loadingStats } = useGetAdminStatsQuery(undefined, { skip: tab !== 'stats' });
@@ -49,7 +58,7 @@ export const AdminPage = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/login');
+    navigate('/admin/login');
   };
 
   const loading = loadingStats || loadingAffiliates || loadingPayouts || loadingTop;
@@ -75,8 +84,8 @@ export const AdminPage = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 p-1 bg-surface/50 rounded-2xl border border-border/50 max-w-fit mx-auto sm:mx-0 overflow-x-auto">
-          {(['stats', 'affiliates', 'payouts', 'top'] as Tab[]).map((t) => (
+        <div className="flex gap-2 p-1 bg-surface/50 rounded-2xl border border-border/50 flex-wrap overflow-x-auto">
+          {(['stats', 'affiliates', 'payouts', 'commissions', 'top'] as Tab[]).map((t) => (
             <button 
               key={t} 
               onClick={() => setTab(t)}
@@ -86,7 +95,7 @@ export const AdminPage = () => {
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface'
               }`}
             >
-              {t === 'top' ? 'Top Affiliates' : t.charAt(0).toUpperCase() + t.slice(1)}
+              {TAB_LABELS[t]}
             </button>
           ))}
         </div>
@@ -111,6 +120,7 @@ export const AdminPage = () => {
               {tab === 'stats' && statsData?.data && <StatsTab stats={statsData.data} />}
               {tab === 'affiliates' && <AffiliatesTab affiliates={affiliatesData?.data?.data || []} search={search} onSearchChange={setSearch} />}
               {tab === 'payouts' && <PayoutsTab payouts={payoutsData?.data || []} payoutStatus={payoutStatus} onStatusChange={setPayoutStatus} onAction={handlePayout} />}
+              {tab === 'commissions' && <CommissionsTab />}
               {tab === 'top' && <TopAffiliatesTab topAffiliates={topAffiliatesData?.data || []} />}
             </>
           )}
