@@ -28,12 +28,12 @@ export const rejectPayout = async (req: Request, res: Response, next: NextFuncti
 };
 
 export const approveCommission = async (req: Request, res: Response, next: NextFunction) => {
-  try { sendSuccess(res, await adminService.approveCommission(req.params.id)); }
+  try { sendSuccess(res, await adminService.approveCommission(req.params.id as string)); }
   catch (err) { next(err); }
 };
 
 export const rejectCommission = async (req: Request, res: Response, next: NextFunction) => {
-  try { sendSuccess(res, await adminService.rejectCommission(req.params.id)); }
+  try { sendSuccess(res, await adminService.rejectCommission(req.params.id as string)); }
   catch (err) { next(err); }
 };
 
