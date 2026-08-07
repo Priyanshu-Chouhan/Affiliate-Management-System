@@ -47,7 +47,7 @@ export const CommissionHistoryPage = () => {
     <div className="min-h-screen bg-background text-text-primary p-6 md:p-12">
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 glass-panel p-6">
-          <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-indigo-400">
+          <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-violet-400">
             Commission History
           </h1>
           <Link to="/dashboard" className="px-5 py-2 rounded-xl bg-surface hover:bg-surface-hover border border-border transition-colors">

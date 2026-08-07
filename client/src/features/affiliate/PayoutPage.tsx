@@ -67,7 +67,7 @@ export const PayoutPage = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 glass-panel p-6">
           <div>
-            <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-indigo-400">
+            <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-violet-400">
               Payout Request
             </h1>
             <p className="text-text-secondary mt-1">Withdraw your available earnings</p>

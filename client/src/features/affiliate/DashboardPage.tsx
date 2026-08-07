@@ -45,7 +45,7 @@ export const DashboardPage = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-panel p-6">
           <div>
-            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-indigo-400">
+            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-violet-400">
               Welcome back, {user?.name}
             </h1>
             <p className="text-text-secondary mt-1">Here's what's happening with your referrals today.</p>
@@ -85,10 +85,10 @@ export const DashboardPage = () => {
           <button 
             onClick={handleSimulatePurchase}
             disabled={isPurchasing}
-            className={`px-6 py-3 rounded-xl font-bold shadow-lg transition-all duration-300 active:scale-95 ${
+            className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 active:scale-95 ${
               isPurchasing 
-                ? 'bg-emerald-800 text-emerald-200 cursor-not-allowed'
-                : 'bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white shadow-emerald-500/25'
+                ? 'bg-surface-hover text-text-secondary cursor-not-allowed'
+                : 'bg-surface-hover hover:bg-border text-white shadow-sm border border-border'
             }`}
           >
             {isPurchasing ? 'Processing...' : '🛒 Simulate Purchase ($1000)'}

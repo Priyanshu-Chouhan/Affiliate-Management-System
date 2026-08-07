@@ -29,7 +29,7 @@ export const ReferralLinkBox = ({ link }: ReferralLinkBoxProps) => {
           className={`px-6 py-3 rounded-xl font-semibold text-white shadow-lg transition-all duration-300 active:scale-95 ${
             copied
               ? 'bg-gradient-to-r from-emerald-500 to-green-600 shadow-emerald-500/25'
-              : 'bg-gradient-to-r from-primary to-indigo-600 shadow-primary/25 hover:from-primary-hover hover:to-indigo-700'
+              : 'bg-gradient-to-r from-primary to-orange-500 shadow-primary/25 hover:from-primary-hover hover:to-orange-600'
           }`}
         >
           {copied ? '✓ Copied!' : 'Copy Link'}

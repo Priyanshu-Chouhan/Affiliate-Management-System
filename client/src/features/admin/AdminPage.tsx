@@ -82,7 +82,7 @@ export const AdminPage = () => {
               onClick={() => setTab(t)}
               className={`px-6 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 whitespace-nowrap ${
                 tab === t 
-                  ? 'bg-gradient-to-r from-primary to-indigo-600 text-white shadow-lg shadow-primary/25' 
+                  ? 'bg-gradient-to-r from-primary to-violet-500 text-white shadow-lg shadow-primary/25' 
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface'
               }`}
             >
