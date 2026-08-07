@@ -48,6 +48,8 @@ export interface Referral {
   status: 'pending' | 'purchased';
   createdAt: string;
   referredUser: { id: string; name: string; email: string };
+  commissionEarned: number;
+  commissionStatus: 'pending' | 'approved' | 'paid' | 'rejected' | null;
 }
 
 export interface Commission {

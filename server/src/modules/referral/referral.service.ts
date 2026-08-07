@@ -1,9 +1,16 @@
 import db from '@/config/db';
 import { parsePagination, paginatedResponse } from '@/common/utils/pagination';
 
+type SortOrder = 'asc' | 'desc';
+
 export const getReferrals = async (affiliateId: string, query: Record<string, unknown>) => {
   const { skip, take, page, limit } = parsePagination(query);
   const search = String(query.search ?? '');
+  const sortBy = String(query.sortBy ?? 'createdAt');
+  const sortOrder = (String(query.sortOrder ?? 'desc')) as SortOrder;
+
+  const allowedSortFields = ['createdAt', 'status'];
+  const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'createdAt';
 
   const where = {
     referrerId: affiliateId,
@@ -17,11 +24,21 @@ export const getReferrals = async (affiliateId: string, query: Record<string, un
       where,
       skip,
       take,
-      orderBy: { createdAt: 'desc' },
-      include: { referredUser: { select: { id: true, name: true, email: true } } },
+      orderBy: { [safeSortBy]: sortOrder },
+      include: {
+        referredUser: { select: { id: true, name: true, email: true } },
+        commissions: { select: { amount: true, status: true }, take: 1 },
+      },
     }),
     db.referral.count({ where }),
   ]);
 
-  return paginatedResponse(referrals, total, page, limit);
+  const mapped = referrals.map((r) => ({
+    ...r,
+    commissionEarned: r.commissions[0]?.amount?.toNumber() ?? 0,
+    commissionStatus: r.commissions[0]?.status ?? null,
+    commissions: undefined,
+  }));
+
+  return paginatedResponse(mapped, total, page, limit);
 };

@@ -4,6 +4,8 @@ import { DEFAULT_COMMISSION_RATE } from '@/common/constants';
 import { parsePagination, paginatedResponse } from '@/common/utils/pagination';
 import { CommissionStatusFilter } from './commission.types';
 
+type SortOrder = 'asc' | 'desc';
+
 export const createCommission = async (
   tx: Prisma.TransactionClient,
   purchaseId: string,
@@ -35,6 +37,11 @@ export const createCommission = async (
 export const getCommissions = async (affiliateId: string, query: Record<string, unknown>) => {
   const { skip, take, page, limit } = parsePagination(query);
   const status = query.status as CommissionStatusFilter | undefined;
+  const sortBy = String(query.sortBy ?? 'createdAt');
+  const sortOrder = (String(query.sortOrder ?? 'desc')) as SortOrder;
+
+  const allowedSortFields = ['createdAt', 'amount', 'status'];
+  const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'createdAt';
 
   const where = {
     affiliateId,
@@ -46,7 +53,7 @@ export const getCommissions = async (affiliateId: string, query: Record<string, 
       where,
       skip,
       take,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { [safeSortBy]: sortOrder },
       include: { purchase: { select: { amount: true, createdAt: true } } },
     }),
     db.commission.count({ where }),

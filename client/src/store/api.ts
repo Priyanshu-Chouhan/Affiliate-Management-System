@@ -92,11 +92,11 @@ export const api = createApi({
       }),
     }),
     requestPayout: builder.mutation({
-      query: (body) => ({ url: 'payout', method: 'POST', body }),
+      query: (body) => ({ url: 'affiliate/payout', method: 'POST', body }),
       invalidatesTags: ['Dashboard', 'PayoutHistory'],
     }),
     getPayoutHistory: builder.query({
-      query: () => 'payout/history',
+      query: () => 'affiliate/payout/history',
       providesTags: ['PayoutHistory'],
     }),
     

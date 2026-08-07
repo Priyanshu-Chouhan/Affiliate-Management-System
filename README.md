@@ -2,6 +2,16 @@
 
 Full-stack affiliate management platform — React + TypeScript frontend, Node/Express + TypeScript backend, PostgreSQL via Prisma.
 
+## Tech Stack
+
+| Layer | Technologies |
+|---|---|
+| **Frontend** | React 18, TypeScript, Vite, Redux Toolkit, RTK Query, React Hook Form, Zod, TailwindCSS |
+| **Backend** | Node.js, Express, TypeScript, Prisma ORM, PostgreSQL |
+| **Auth** | JWT (Access + Refresh Token Rotation) |
+| **Security** | Helmet, CORS Whitelist, Rate Limiting, Zod Validation |
+| **CI/CD** | GitHub Actions |
+
 ## Project Structure
 
 ```
@@ -69,8 +79,8 @@ VITE_API_BASE_URL=http://localhost:4000/api
 ### Affiliate (JWT required)
 - `GET /api/affiliate/referral-link`
 - `GET /api/affiliate/dashboard`
-- `GET /api/affiliate/referrals?page=&search=`
-- `GET /api/affiliate/commissions?page=&status=`
+- `GET /api/affiliate/referrals?page=&search=&sortBy=createdAt&sortOrder=desc`
+- `GET /api/affiliate/commissions?page=&status=&sortBy=createdAt&sortOrder=desc`
 - `POST /api/affiliate/payout` — `{ amount }`
 - `GET /api/affiliate/payout/history`
 
@@ -86,3 +96,14 @@ VITE_API_BASE_URL=http://localhost:4000/api
 
 ### Purchase (JWT required)
 - `POST /api/purchases` — `{ amount, status: "success"|"failed"|"cancelled" }`
+
+## Security
+
+- **Helmet** — Sets secure HTTP headers (X-Content-Type, X-Frame-Options, etc.)
+- **CORS Whitelist** — Only allowed frontend origins can access the API
+- **Rate Limiting** — Global: 100 req/15min, Auth: 20 req/15min per IP
+- **Body Size Limit** — JSON payloads capped at 1MB
+- **JWT Refresh Token Rotation** — New refresh token on every refresh call
+- **Zod Validation** — All inputs validated on both client and server
+- **Password Hashing** — bcrypt with salt rounds of 10
+- **Role-Based Access** — Admin routes protected by role middleware

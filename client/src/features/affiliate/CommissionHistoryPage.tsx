@@ -6,13 +6,27 @@ import type { Commission } from '@/types';
 
 const STATUS_OPTIONS = ['', 'pending', 'approved', 'paid', 'rejected'];
 
+const SORT_OPTIONS = [
+  { label: 'Newest First', value: 'createdAt:desc' },
+  { label: 'Oldest First', value: 'createdAt:asc' },
+  { label: 'Amount: High → Low', value: 'amount:desc' },
+  { label: 'Amount: Low → High', value: 'amount:asc' },
+  { label: 'Status A-Z', value: 'status:asc' },
+  { label: 'Status Z-A', value: 'status:desc' },
+];
+
 export const CommissionHistoryPage = () => {
   const [status, setStatus] = useState('');
   const [page, setPage] = useState(1);
-  
+  const [sort, setSort] = useState('createdAt:desc');
+
+  const [sortBy, sortOrder] = sort.split(':');
+
   const { data, isLoading: loading } = useGetCommissionsQuery({ 
     page, 
-    status: status || undefined 
+    status: status || undefined,
+    sortBy,
+    sortOrder,
   });
 
   const commissions: Commission[] = data?.data?.data || [];
@@ -42,20 +56,31 @@ export const CommissionHistoryPage = () => {
         </div>
 
         <div className="glass-panel p-6">
-          <select
-            value={status}
-            onChange={(e) => {
-              setStatus(e.target.value);
-              setPage(1);
-            }}
-            className="premium-input mb-6 max-w-xs appearance-none"
-          >
-            {STATUS_OPTIONS.map((s) => (
-              <option key={s} value={s}>
-                {s ? s.charAt(0).toUpperCase() + s.slice(1) : 'All Statuses'}
-              </option>
-            ))}
-          </select>
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <select
+              value={status}
+              onChange={(e) => {
+                setStatus(e.target.value);
+                setPage(1);
+              }}
+              className="premium-input max-w-xs appearance-none"
+            >
+              {STATUS_OPTIONS.map((s) => (
+                <option key={s} value={s}>
+                  {s ? s.charAt(0).toUpperCase() + s.slice(1) : 'All Statuses'}
+                </option>
+              ))}
+            </select>
+            <select
+              value={sort}
+              onChange={(e) => { setSort(e.target.value); setPage(1); }}
+              className="premium-input max-w-xs appearance-none"
+            >
+              {SORT_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          </div>
 
           {loading ? (
             <div className="flex justify-center p-12 text-primary">
