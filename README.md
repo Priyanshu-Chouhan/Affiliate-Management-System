@@ -3,7 +3,7 @@
 Full-stack affiliate management platform — React + TypeScript frontend, Node/Express + TypeScript backend, PostgreSQL via Prisma.
 
 ## Live Links
-- **Frontend App**: [https://affiliate-frontend-bk5i.onrender.com](https://affiliate-frontend-bk5i.onrender.com)
+- **Frontend App**: [https://affiliate-management-system-one.vercel.app](https://affiliate-management-system-one.vercel.app)
 - **Backend API**: [https://affiliate-backend.onrender.com](https://affiliate-backend.onrender.com)
 *(Note: Replace backend link with the actual live backend URL if different)*
 

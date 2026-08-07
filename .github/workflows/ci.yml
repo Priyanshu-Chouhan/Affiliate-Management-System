@@ -23,15 +23,11 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        cache-dependency-path: |
-          client/package-lock.json
-          server/package-lock.json
 
     # --- SERVER SETUP ---
     - name: Install Server Dependencies
       working-directory: ./server
-      run: rm -f package-lock.json && npm install
+      run: rm -rf node_modules package-lock.json && npm install --no-package-lock
 
     - name: Generate Prisma Client
       working-directory: ./server
@@ -44,7 +40,7 @@ jobs:
     # --- CLIENT SETUP ---
     - name: Install Client Dependencies
       working-directory: ./client
-      run: rm -f package-lock.json && npm install
+      run: rm -rf node_modules package-lock.json && npm install --no-package-lock
 
     - name: Build Client
       working-directory: ./client

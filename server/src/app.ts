@@ -14,6 +14,7 @@ app.use(helmet());
 const allowedOrigins = [
   process.env.FRONTEND_URL ?? 'http://localhost:5173',
   'https://affiliate-frontend-bk5i.onrender.com',
+  'https://affiliate-management-system-one.vercel.app',
 ];
 app.use(cors({
   origin: (origin, cb) => {
