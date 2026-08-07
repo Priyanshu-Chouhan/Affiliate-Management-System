@@ -95,7 +95,7 @@ export const PayoutPage = () => {
                   type="number"
                   placeholder="0.00"
                   step="0.01"
-                  className={`premium-input text-lg ${errors.amount ? 'border-red-500' : ''}`}
+                  className={`premium-input text-lg appearance-none ${errors.amount ? 'border-red-500' : ''}`}
                   {...register('amount', { valueAsNumber: true })}
                 />
                 {errors.amount && <p className="text-red-400 text-xs mt-1">{errors.amount.message}</p>}

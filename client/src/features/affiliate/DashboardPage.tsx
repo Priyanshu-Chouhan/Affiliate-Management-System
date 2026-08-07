@@ -63,9 +63,9 @@ export const DashboardPage = () => {
             { label: 'Pending Referrals', value: stats?.pendingReferrals ?? 0 },
             { label: 'Total Earnings', value: `$${(stats?.totalEarnings ?? 0).toFixed(2)}` },
             { label: 'Available Balance', value: `$${(stats?.availableBalance ?? 0).toFixed(2)}` },
-            { label: 'Pending Commissions', value: `$${(stats?.pendingCommissions ?? 0).toFixed(2)}` },
-            { label: 'Approved Commissions', value: `$${(stats?.approvedCommissions ?? 0).toFixed(2)}` },
-            { label: 'Paid Commissions', value: `$${(stats?.paidCommissions ?? 0).toFixed(2)}` },
+            { label: 'Pending Commission', value: `$${(stats?.pendingCommissions ?? 0).toFixed(2)}` },
+            { label: 'Approved Commission', value: `$${(stats?.approvedCommissions ?? 0).toFixed(2)}` },
+            { label: 'Paid Commission', value: `$${(stats?.paidCommissions ?? 0).toFixed(2)}` },
           ].map(({ label, value }) => (
             <StatCard key={label} label={label} value={value} />
           ))}
@@ -77,9 +77,9 @@ export const DashboardPage = () => {
         {/* Navigation & Actions */}
         <div className="glass-panel p-6 flex flex-wrap gap-4 items-center justify-between">
           <div className="flex flex-wrap gap-4">
-            <Link to="/referrals" className="premium-button text-center w-auto">View Referrals</Link>
-            <Link to="/commissions" className="premium-button text-center w-auto">View Commissions</Link>
-            <Link to="/payout" className="px-6 py-3 rounded-xl bg-surface hover:bg-surface-hover text-white transition-colors border border-border">Request Payout</Link>
+            <Link to="/referrals" className="premium-button text-center w-auto">Referral History</Link>
+            <Link to="/commissions" className="premium-button text-center w-auto">Commission History</Link>
+            <Link to="/payout" className="px-6 py-3 rounded-xl bg-surface hover:bg-surface-hover text-white transition-colors border border-border">Payout Request</Link>
           </div>
           
           <button 

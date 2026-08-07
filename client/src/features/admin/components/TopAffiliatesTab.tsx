@@ -21,9 +21,9 @@ export const TopAffiliatesTab = ({ topAffiliates }: TopAffiliatesTabProps) => (
             <tr key={a.affiliate.id} className="hover:bg-surface/50 transition-colors">
               <td className="p-4">
                 <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full font-bold ${
-                  idx === 0 ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/50 shadow-[0_0_10px_rgba(234,179,8,0.2)]' :
-                  idx === 1 ? 'bg-gray-300/20 text-gray-300 border border-gray-300/50' :
-                  idx === 2 ? 'bg-amber-700/20 text-amber-600 border border-amber-700/50' :
+                  idx === 0 ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' :
+                  idx === 1 ? 'bg-gray-300/20 text-gray-300 border border-gray-300/30' :
+                  idx === 2 ? 'bg-amber-700/20 text-amber-600 border border-amber-700/30' :
                   'bg-surface text-text-secondary'
                 }`}>
                   {idx + 1}
