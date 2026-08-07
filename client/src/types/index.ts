@@ -77,8 +77,14 @@ export interface AdminStats {
   totalUsers: number;
   totalReferrals: number;
   totalCommissionsIssued: number;
+  approvedCommissions: number;
+  paidCommissions: number;
+  pendingCommissions: number;
+  rejectedCommissions: number;
   totalPayoutsProcessed: number;
   pendingPayouts: number;
+  approvedPayouts: number;
+  rejectedPayouts: number;
 }
 
 export interface AdminAffiliate {

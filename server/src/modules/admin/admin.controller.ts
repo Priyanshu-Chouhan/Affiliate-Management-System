@@ -27,6 +27,16 @@ export const rejectPayout = async (req: Request, res: Response, next: NextFuncti
   catch (err) { next(err); }
 };
 
+export const approveCommission = async (req: Request, res: Response, next: NextFunction) => {
+  try { sendSuccess(res, await adminService.approveCommission(req.params.id)); }
+  catch (err) { next(err); }
+};
+
+export const rejectCommission = async (req: Request, res: Response, next: NextFunction) => {
+  try { sendSuccess(res, await adminService.rejectCommission(req.params.id)); }
+  catch (err) { next(err); }
+};
+
 export const getCommissions = async (req: Request, res: Response, next: NextFunction) => {
   try { sendSuccess(res, await adminService.getCommissions()); }
   catch (err) { next(err); }

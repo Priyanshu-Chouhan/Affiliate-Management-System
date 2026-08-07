@@ -12,7 +12,7 @@ import { LoadingScreen } from '@/components';
 import type { PayoutRequest } from '@/types';
 
 const payoutSchema = z.object({
-  amount: z.number().min(1, { message: "Amount must be at least 1" }),
+  amount: z.number({ invalid_type_error: 'Please enter a valid amount' }).min(1, { message: "Amount must be at least 1" }),
 });
 
 type PayoutFormValues = z.infer<typeof payoutSchema>;

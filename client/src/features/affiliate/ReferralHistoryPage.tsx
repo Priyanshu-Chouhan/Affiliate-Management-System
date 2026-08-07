@@ -81,7 +81,7 @@ export const ReferralHistoryPage = () => {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-border/50 text-text-secondary text-sm uppercase tracking-wider">
-                    {['Name', 'Email', 'Referral Status', 'Commission Earned', 'Commission Status', 'Date'].map((h) => (
+                    {['Referral Name', 'Registration Date', 'Purchase Status', 'Commission Earned', 'Commission Status'].map((h) => (
                       <th key={h} className="p-4 font-medium">{h}</th>
                     ))}
                   </tr>
@@ -89,11 +89,11 @@ export const ReferralHistoryPage = () => {
                 <tbody className="divide-y divide-border/30">
                   {referrals.map((r) => (
                     <tr key={r.id} className="hover:bg-surface/50 transition-colors">
-                      <td className="p-4">{r.referredUser.name}</td>
-                      <td className="p-4 text-text-secondary">{r.referredUser.email}</td>
+                      <td className="p-4 font-medium text-white">{r.referredUser.name}</td>
+                      <td className="p-4 text-text-secondary">{new Date(r.createdAt).toLocaleDateString()}</td>
                       <td className="p-4">
                         <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(r.status)}`}>
-                          {r.status}
+                          {r.status.charAt(0).toUpperCase() + r.status.slice(1)}
                         </span>
                       </td>
                       <td className="p-4 font-bold text-primary">
@@ -107,9 +107,6 @@ export const ReferralHistoryPage = () => {
                         ) : (
                           <span className="text-text-secondary">—</span>
                         )}
-                      </td>
-                      <td className="p-4 text-text-secondary">
-                        {new Date(r.createdAt).toLocaleDateString()}
                       </td>
                     </tr>
                   ))}

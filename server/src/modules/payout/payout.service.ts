@@ -3,7 +3,9 @@ import db from '@/config/db';
 import { AppError } from '@/common/errors/AppError';
 import { DEFAULT_MIN_PAYOUT } from '@/common/constants';
 
-export const payoutSchema = z.object({ amount: z.number().positive() });
+export const payoutSchema = z.object({ 
+  amount: z.number({ invalid_type_error: 'Please enter a valid amount' }).positive({ message: 'Amount must be greater than 0' })
+});
 export type PayoutDto = z.infer<typeof payoutSchema>;
 
 export const requestPayout = async (affiliateId: string, dto: PayoutDto) => {
@@ -13,7 +15,7 @@ export const requestPayout = async (affiliateId: string, dto: PayoutDto) => {
       select: { amount: true },
     }),
     db.payoutRequest.findMany({
-      where: { affiliateId, status: 'pending' },
+      where: { affiliateId, status: { in: ['pending', 'approved'] } },
       select: { amount: true },
     }),
     db.setting.findUnique({ where: { key: 'min_payout_amount' } }),

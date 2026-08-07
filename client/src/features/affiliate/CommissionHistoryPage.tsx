@@ -94,7 +94,7 @@ export const CommissionHistoryPage = () => {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-border/50 text-text-secondary text-sm uppercase tracking-wider">
-                    {['Purchase Amount', 'Commission', 'Status', 'Description', 'Date'].map((h) => (
+                    {['Date', 'Commission Amount', 'Status', 'Description'].map((h) => (
                       <th key={h} className="p-4 font-medium">{h}</th>
                     ))}
                   </tr>
@@ -102,7 +102,7 @@ export const CommissionHistoryPage = () => {
                 <tbody className="divide-y divide-border/30">
                   {commissions.map((c) => (
                     <tr key={c.id} className="hover:bg-surface/50 transition-colors">
-                      <td className="p-4 text-text-secondary">${Number(c.purchase.amount).toFixed(2)}</td>
+                      <td className="p-4 text-text-secondary">{new Date(c.createdAt).toLocaleDateString()}</td>
                       <td className="p-4 font-bold text-primary">${Number(c.amount).toFixed(2)}</td>
                       <td className="p-4">
                         <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(c.status)}`}>
@@ -110,12 +110,11 @@ export const CommissionHistoryPage = () => {
                         </span>
                       </td>
                       <td className="p-4 text-text-secondary">{c.description || '-'}</td>
-                      <td className="p-4 text-text-secondary">{new Date(c.createdAt).toLocaleDateString()}</td>
                     </tr>
                   ))}
                   {commissions.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="p-8 text-center text-text-secondary">
+                      <td colSpan={4} className="p-8 text-center text-text-secondary">
                         No commissions found.
                       </td>
                     </tr>

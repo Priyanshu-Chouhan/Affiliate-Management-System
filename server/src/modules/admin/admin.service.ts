@@ -7,8 +7,8 @@ export const getAffiliates = async (query: Record<string, unknown>) => {
   const search = String(query.search ?? '');
 
   const where = search
-    ? { OR: [{ name: { contains: search, mode: 'insensitive' as const } }, { email: { contains: search, mode: 'insensitive' as const } }] }
-    : {};
+    ? { role: 'user' as const, OR: [{ name: { contains: search, mode: 'insensitive' as const } }, { email: { contains: search, mode: 'insensitive' as const } }] }
+    : { role: 'user' as const };
 
   const [affiliates, total] = await Promise.all([
     db.user.findMany({
@@ -60,6 +60,20 @@ export const rejectPayout = async (id: string) => {
   return db.payoutRequest.update({ where: { id }, data: { status: 'rejected', processedAt: new Date() } });
 };
 
+export const approveCommission = async (id: string) => {
+  const commission = await db.commission.findUnique({ where: { id } });
+  if (!commission) throw new AppError(404, 'Commission not found');
+  if (commission.status !== 'pending') throw new AppError(400, 'Commission is not pending');
+  return db.commission.update({ where: { id }, data: { status: 'approved' } });
+};
+
+export const rejectCommission = async (id: string) => {
+  const commission = await db.commission.findUnique({ where: { id } });
+  if (!commission) throw new AppError(404, 'Commission not found');
+  if (commission.status !== 'pending') throw new AppError(400, 'Commission is not pending');
+  return db.commission.update({ where: { id }, data: { status: 'rejected' } });
+};
+
 export const getCommissions = async () =>
   db.commission.findMany({
     orderBy: { createdAt: 'desc' },
@@ -71,7 +85,7 @@ export const getCommissions = async () =>
 
 export const getStats = async () => {
   const [totalUsers, totalReferrals, commissions, payouts] = await Promise.all([
-    db.user.count(),
+    db.user.count({ where: { role: 'user' } }),
     db.referral.count(),
     db.commission.findMany({ select: { amount: true, status: true } }),
     db.payoutRequest.findMany({ select: { amount: true, status: true } }),
@@ -84,8 +98,14 @@ export const getStats = async () => {
     totalUsers,
     totalReferrals,
     totalCommissionsIssued: sum(commissions),
+    approvedCommissions: sum(commissions.filter((c) => c.status === 'approved')),
+    paidCommissions: sum(commissions.filter((c) => c.status === 'paid')),
+    pendingCommissions: sum(commissions.filter((c) => c.status === 'pending')),
+    rejectedCommissions: sum(commissions.filter((c) => c.status === 'rejected')),
     totalPayoutsProcessed: sum(payouts.filter((p) => p.status === 'paid')),
     pendingPayouts: sum(payouts.filter((p) => p.status === 'pending')),
+    approvedPayouts: sum(payouts.filter((p) => p.status === 'approved')),
+    rejectedPayouts: sum(payouts.filter((p) => p.status === 'rejected')),
   };
 };
 

@@ -21,6 +21,11 @@ pnpm-debug.log*
 .idea/
 .DS_Store
 Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # TypeScript build info
 *.tsbuildinfo
@@ -33,6 +38,12 @@ Thumbs.db
 # Certificates / secrets
 *.pem
 
-# Coverage
+# Coverage & Testing
 coverage/
 **/coverage/
+.nyc_output
+
+# Vite / React specific
+dist-ssr/
+*.local
+.eslintcache

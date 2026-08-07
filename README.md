@@ -2,6 +2,11 @@
 
 Full-stack affiliate management platform — React + TypeScript frontend, Node/Express + TypeScript backend, PostgreSQL via Prisma.
 
+## Live Links
+- **Frontend App**: [https://affiliate-frontend-bk5i.onrender.com](https://affiliate-frontend-bk5i.onrender.com)
+- **Backend API**: [https://affiliate-backend.onrender.com](https://affiliate-backend.onrender.com)
+*(Note: Replace backend link with the actual live backend URL if different)*
+
 ## Tech Stack
 
 | Layer | Technologies |
@@ -48,8 +53,7 @@ npm run dev            # starts on http://localhost:5173
 | Email | Password | Role |
 |---|---|---|
 | admin@example.com | admin123 | admin |
-| alice@example.com | password123 | affiliate (has referrals) |
-| bob@example.com | password123 | affiliate |
+
 
 ## Environment Variables
 
@@ -96,6 +100,8 @@ VITE_API_BASE_URL=http://localhost:4000/api
 
 ### Purchase (JWT required)
 - `POST /api/purchases` — `{ amount, status: "success"|"failed"|"cancelled" }`
+
+> **Note**: A complete Postman collection is available in the root directory (`postman_collection.json`). You can import this file directly into Postman to test all available API endpoints.
 
 ## Security
 

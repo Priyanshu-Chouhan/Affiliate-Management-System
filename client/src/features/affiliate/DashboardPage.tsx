@@ -27,7 +27,7 @@ export const DashboardPage = () => {
   const handleSimulatePurchase = async () => {
     try {
       await simulatePurchase({ amount: 1000, status: 'success' }).unwrap();
-      alert('Purchase Successful! The referrer has received a commission.');
+      alert('Purchase Successful!');
     } catch (err: any) {
       alert('Error making purchase: ' + (err.data?.error || err.message));
     }

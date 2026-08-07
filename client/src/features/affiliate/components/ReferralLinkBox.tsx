@@ -18,7 +18,7 @@ export const ReferralLinkBox = ({ link }: ReferralLinkBoxProps) => {
       <div className="text-xs text-text-secondary mb-3 uppercase tracking-wider font-medium">
         Your Referral Link
       </div>
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col sm:flex-row gap-3 mb-3">
         <input
           value={link}
           readOnly
@@ -34,6 +34,12 @@ export const ReferralLinkBox = ({ link }: ReferralLinkBoxProps) => {
         >
           {copied ? '✓ Copied!' : 'Copy Link'}
         </button>
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-text-secondary uppercase tracking-wider">Referral Code:</span>
+        <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium border border-primary/20">
+          {link.split('ref=')[1] ?? ''}
+        </span>
       </div>
     </div>
   );

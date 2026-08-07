@@ -1,4 +1,4 @@
-import { useGetAdminCommissionsQuery } from '@/store/api';
+import { useGetAdminCommissionsQuery, useApproveCommissionMutation, useRejectCommissionMutation } from '@/store/api';
 
 const getStatusColor = (s: string) => {
   switch (s) {
@@ -11,6 +11,8 @@ const getStatusColor = (s: string) => {
 
 export const CommissionsTab = () => {
   const { data, isLoading } = useGetAdminCommissionsQuery(undefined);
+  const [approveCommission] = useApproveCommissionMutation();
+  const [rejectCommission] = useRejectCommissionMutation();
   const commissions = data?.data || [];
 
   if (isLoading) return (
@@ -28,7 +30,7 @@ export const CommissionsTab = () => {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-border/50 text-text-secondary text-sm uppercase tracking-wider">
-              {['Affiliate', 'Amount', 'Status', 'Description', 'Date'].map((h) => (
+              {['Affiliate', 'Amount', 'Status', 'Description', 'Date', 'Action'].map((h) => (
                 <th key={h} className="p-4 font-medium">{h}</th>
               ))}
             </tr>
@@ -48,11 +50,31 @@ export const CommissionsTab = () => {
                 </td>
                 <td className="p-4 text-text-secondary">{c.description || '—'}</td>
                 <td className="p-4 text-text-secondary">{new Date(c.createdAt).toLocaleDateString()}</td>
+                <td className="p-4">
+                  {c.status === 'pending' ? (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => approveCommission(c.id)}
+                        className="px-4 py-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 rounded-lg text-sm font-medium transition-colors"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => rejectCommission(c.id)}
+                        className="px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 rounded-lg text-sm font-medium transition-colors"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  ) : (
+                    <span className="text-sm text-text-secondary italic">Processed</span>
+                  )}
+                </td>
               </tr>
             ))}
             {commissions.length === 0 && (
               <tr>
-                <td colSpan={5} className="p-8 text-center text-text-secondary">No commissions found.</td>
+                <td colSpan={6} className="p-8 text-center text-text-secondary">No commissions found.</td>
               </tr>
             )}
           </tbody>

@@ -62,7 +62,7 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
 export const api = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
-  tagTypes: ['Dashboard', 'PayoutHistory', 'Admin', 'AdminPayouts'],
+  tagTypes: ['Dashboard', 'PayoutHistory', 'Admin', 'AdminPayouts', 'AdminCommissions'],
   endpoints: (builder) => ({
     login: builder.mutation({
       query: (credentials) => ({ url: 'auth/login', method: 'POST', body: credentials }),
@@ -132,8 +132,17 @@ export const api = createApi({
       query: (id) => ({ url: `admin/payouts/${id}/reject`, method: 'PATCH' }),
       invalidatesTags: ['Admin', 'AdminPayouts'],
     }),
+    approveCommission: builder.mutation({
+      query: (id) => ({ url: `admin/commissions/${id}/approve`, method: 'PATCH' }),
+      invalidatesTags: ['AdminCommissions'],
+    }),
+    rejectCommission: builder.mutation({
+      query: (id) => ({ url: `admin/commissions/${id}/reject`, method: 'PATCH' }),
+      invalidatesTags: ['AdminCommissions'],
+    }),
     getAdminCommissions: builder.query({
       query: () => 'admin/commissions',
+      providesTags: ['AdminCommissions'],
     }),
     getAdminTopAffiliates: builder.query({
       query: () => 'admin/top-affiliates',
@@ -157,5 +166,7 @@ export const {
   useApprovePayoutMutation,
   useRejectPayoutMutation,
   useGetAdminCommissionsQuery,
+  useApproveCommissionMutation,
+  useRejectCommissionMutation,
   useGetAdminTopAffiliatesQuery
 } = api;

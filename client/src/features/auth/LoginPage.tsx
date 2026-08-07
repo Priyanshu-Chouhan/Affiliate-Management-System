@@ -35,15 +35,19 @@ export const LoginPage = ({ isAdmin = false }: { isAdmin?: boolean }) => {
   const onSubmit = async (data: LoginFormValues) => {
     try {
       const res = await loginApi(data).unwrap();
+      if (isAdmin && res.data.user.role !== 'admin') {
+        setError('root', { message: 'Invalid credentials. Please try again.' });
+        return;
+      }
+      if (!isAdmin && res.data.user.role === 'admin') {
+        setError('root', { message: 'Invalid credentials. Please try again.' });
+        return;
+      }
       dispatch(setCredentials({
         user: res.data.user,
         accessToken: res.data.accessToken,
         refreshToken: res.data.refreshToken,
       }));
-      if (isAdmin && res.data.user.role !== 'admin') {
-        setError('root', { message: 'Access denied. Admin only.' });
-        return;
-      }
       navigate(res.data.user.role === 'admin' ? '/admin' : '/dashboard');
     } catch (err: any) {
       setError('root', { 

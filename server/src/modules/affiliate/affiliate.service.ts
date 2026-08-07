@@ -17,7 +17,7 @@ export const getDashboard = async (userId: string) => {
     db.referral.findMany({ where: { referrerId: userId }, select: { status: true } }),
     db.commission.findMany({ where: { affiliateId: userId }, select: { amount: true, status: true } }),
     db.payoutRequest.findMany({
-      where: { affiliateId: userId, status: { in: ['pending', 'paid'] } },
+      where: { affiliateId: userId, status: { in: ['pending', 'approved'] } },
       select: { amount: true, status: true },
     }),
   ]);
@@ -34,7 +34,7 @@ export const getDashboard = async (userId: string) => {
 
   const totalApproved = sum(approved);
   const totalPaid = sum(paid);
-  const pendingPayouts = sum(payouts.filter((p) => p.status === 'pending'));
+  const pendingPayouts = sum(payouts.filter((p) => p.status === 'pending' || p.status === 'approved'));
 
   return {
     totalReferrals: referrals.length,
