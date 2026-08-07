@@ -18,6 +18,7 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export const RegisterPage = () => {
   const [searchParams] = useSearchParams();
+  const refCode = searchParams.get('ref') ?? '';
   const [showPassword, setShowPassword] = useState(false);
   const [registerApi, { isLoading }] = useRegisterMutation();
   const dispatch = useDispatch();
@@ -34,11 +35,8 @@ export const RegisterPage = () => {
   });
 
   useEffect(() => {
-    const ref = searchParams.get('ref');
-    if (ref) {
-      setValue('referralCode', ref);
-    }
-  }, [searchParams, setValue]);
+    if (refCode) setValue('referralCode', refCode);
+  }, [refCode, setValue]);
 
   const onSubmit = async (data: RegisterFormValues) => {
     try {
@@ -130,10 +128,12 @@ export const RegisterPage = () => {
             <label className="block text-sm font-medium text-text-secondary mb-1">Referral Code (Optional)</label>
             <input
               type="text"
-              className="premium-input"
+              className={`premium-input ${refCode ? 'border-primary/50 bg-primary/5 text-primary font-medium' : ''}`}
               placeholder="ABC12345"
+              readOnly={!!refCode}
               {...register('referralCode')}
             />
+            {refCode && <p className="text-primary text-xs mt-1">✓ Referral code applied</p>}
           </div>
           <button type="submit" disabled={isLoading} className="premium-button mt-6">
             {isLoading ? 'Creating Account...' : 'Create Account'}

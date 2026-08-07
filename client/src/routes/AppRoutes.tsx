@@ -25,7 +25,8 @@ export const AppRoutes = () => {
           <Navigate to={isAuth ? '/dashboard' : '/login'} replace />
         }
       />
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/login" element={isAuth ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
+      <Route path="/admin/login" element={isAuth && isAdmin ? <Navigate to="/admin" replace /> : <LoginPage isAdmin />} />
       <Route path="/register" element={<RegisterPage />} />
 
       <Route element={<ProtectedRoute isAllowed={isAuth} />}>

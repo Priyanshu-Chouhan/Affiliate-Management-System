@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -14,11 +14,14 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-export const LoginPage = () => {
+export const LoginPage = ({ isAdmin = false }: { isAdmin?: boolean }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loginApi, { isLoading }] = useLoginMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as any)?.from;
+  const registerTo = from?.pathname?.startsWith('/register') ? from : '/register';
 
   const {
     register,
@@ -32,14 +35,15 @@ export const LoginPage = () => {
   const onSubmit = async (data: LoginFormValues) => {
     try {
       const res = await loginApi(data).unwrap();
-      
-      // Update Redux state
       dispatch(setCredentials({
         user: res.data.user,
         accessToken: res.data.accessToken,
         refreshToken: res.data.refreshToken,
       }));
-      
+      if (isAdmin && res.data.user.role !== 'admin') {
+        setError('root', { message: 'Access denied. Admin only.' });
+        return;
+      }
       navigate(res.data.user.role === 'admin' ? '/admin' : '/dashboard');
     } catch (err: any) {
       setError('root', { 
@@ -56,9 +60,9 @@ export const LoginPage = () => {
       <div className="glass-panel w-full max-w-md p-8 relative z-10 animate-fade-in-up">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-violet-400 mb-2">
-            Welcome Back
+            {isAdmin ? 'Admin Portal' : 'Welcome Back'}
           </h1>
-          <p className="text-text-secondary">Sign in to your affiliate account</p>
+          <p className="text-text-secondary">{isAdmin ? 'Sign in with your admin credentials' : 'Sign in to your affiliate account'}</p>
         </div>
 
         {errors.root && (
@@ -111,12 +115,14 @@ export const LoginPage = () => {
           </button>
         </form>
 
-        <p className="mt-8 text-center text-text-secondary text-sm">
-          Don't have an account?{' '}
-          <Link to="/register" className="text-primary hover:text-primary-hover font-medium transition-colors">
-            Create account
-          </Link>
-        </p>
+        {!isAdmin && (
+          <p className="mt-8 text-center text-text-secondary text-sm">
+            Don't have an account?{' '}
+            <Link to={registerTo} className="text-primary hover:text-primary-hover font-medium transition-colors">
+              Create account
+            </Link>
+          </p>
+        )}
       </div>
     </div>
   );
