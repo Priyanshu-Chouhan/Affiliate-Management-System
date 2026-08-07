@@ -31,7 +31,7 @@ jobs:
     # --- SERVER SETUP ---
     - name: Install Server Dependencies
       working-directory: ./server
-      run: npm install
+      run: rm -f package-lock.json && npm install
 
     - name: Generate Prisma Client
       working-directory: ./server
@@ -44,7 +44,7 @@ jobs:
     # --- CLIENT SETUP ---
     - name: Install Client Dependencies
       working-directory: ./client
-      run: npm install
+      run: rm -f package-lock.json && npm install
 
     - name: Build Client
       working-directory: ./client
